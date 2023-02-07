@@ -4,7 +4,7 @@ This folder contains an example fuzzer for libpng, using LLMP for fast multi-pro
 
 In contrast to other fuzzer examples, this setup uses `fuzz_loop_for`, to occasionally respawn the fuzzer executor.
 While this costs performance, it can be useful for targets with memory leaks or other instabilities.
-If your target is really instable, however, consider exchanging the `InProcessExecutor` for a `ForkserverExecutor` instead.
+If your target is really unstable, however, consider exchanging the `InProcessExecutor` for a `ForkserverExecutor` instead.
 
 It also uses the `introspection` feature, printing fuzzer stats during execution.
 

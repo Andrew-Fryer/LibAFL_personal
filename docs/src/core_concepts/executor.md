@@ -5,7 +5,7 @@ For instance, for in-memory fuzzers like libFuzzer an execution is a call to an 
 
 In our model, an Executor is the entity that defines not only how to execute the target, but all the volatile operations that are related to just a single run of the target.
 
-So the Executor is for instance responsible to inform the program about the input that the fuzzer wants to use in the run, writing to a memory location for instance or passing it as a parameter to the harness function.
+So the Executor is for instance responsible for informing the program about the input that the fuzzer wants to use in the run, writing to a memory location for instance or passing it as a parameter to the harness function.
 
 In our model, it can also hold a set of Observers connected with each execution.
 
@@ -40,15 +40,15 @@ Here we make a shared memory region; `shmem`, and write this to environmental va
 
 Another feature of the `ForkserverExecutor` to mention is the shared memory testcases. In normal cases, the mutated input is passed between the forkserver and the instrumented binary via `.cur_input` file. You can improve your forkserver fuzzer's performance by passing the input with shared memory.  
 
-If the target is configured to use shared memory testcases, the `ForkserverExecutor` will notice this during the handshake and will automatically set up things accordingly.
+If the target is configured to use shared memory testcases, the `ForkserverExecutor` will notice this during the handshake and will automatically set things up accordingly.
 See AFL++'s [_documentation_](https://github.com/AFLplusplus/AFLplusplus/blob/stable/instrumentation/README.persistent_mode.md#5-shared-memory-fuzzing) or the fuzzer example in `forkserver_simple/src/program.c` for reference.
 
 ## InprocessForkExecutor
 
-Finally, we'll talk about the `InProcessForkExecutor`.
+Finally, we'll talk about `InProcessForkExecutor`.
 `InProcessForkExecutor` has only one difference from `InprocessExecutor`; It forks before running the harness and that's it.
 
-But why do we want to do so? well, under some circumstances, you may find your harness pretty unstable or your harness wreaks havoc on the global states. In this case, you want to fork it before executing the harness runs in the child process so that it doesn't break things.
+But why do we want to do so? Well, under some circumstances, you may find your harness pretty unstable or your harness wreaks havoc on the global states. In this case, you want to fork it before executing the harness runs in the child process so that it doesn't break things.
 
 However, we have to take care of the shared memory, it's the child process that runs the harness code and writes the coverage to the map.
 

@@ -8,7 +8,7 @@ Most of the time, the notion of Feedback is deeply linked to the Observer, but t
 The Feedback, in most of the cases, processes the information reported by one or more observers to decide if the execution is interesting.
 The concept of "interestingness" is abstract, but typically it is related to a novelty search (i.e. interesting inputs are those that reach a previously unseen edge in the control flow graph).
 
-As an example, given an Observer that reports all the sizes of memory allocations, a maximization Feedback can be used to maximize these sizes to sport pathological inputs in terms of memory consumption.
+As an example, given an Observer that reports all the sizes of memory allocations, a maximization Feedback can be used to maximize these sizes to spot pathological inputs in terms of memory consumption.
 
 In terms of code, the library offers the [`Feedback`](https://docs.rs/libafl/0/libafl/feedbacks/trait.Feedback.html) and the [`FeedbackState`](https://docs.rs/libafl/0/libafl/feedbacks/trait.FeedbackState.html) traits.
 The first is used to implement functors that, given the state of the observers from the last execution, tells if the execution was interesting. The second is tied with `Feedback` and it is the state of the data that the feedback wants to persist in the fuzzers's state, for instance the cumulative map holding all the edges seen so far in the case of a feedback based on edge coverage.

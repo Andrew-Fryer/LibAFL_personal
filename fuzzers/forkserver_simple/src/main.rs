@@ -40,14 +40,14 @@ struct Opt {
     #[arg(
         help = "The instrumented binary we want to fuzz",
         name = "EXEC",
-        required = true
+        default_value = "./target/release/program"
     )]
     executable: String,
 
     #[arg(
         help = "The directory to read initial inputs from ('seeds')",
         name = "INPUT_DIR",
-        required = true
+        default_value = "./corpus"
     )]
     in_dir: PathBuf,
 
@@ -63,7 +63,7 @@ struct Opt {
         help = "If not set, the child's stdout and stderror will be redirected to /dev/null",
         short = 'd',
         long = "debug-child",
-        default_value = "false"
+        default_value = "true"
     )]
     debug_child: bool,
 

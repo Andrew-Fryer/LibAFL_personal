@@ -22,6 +22,10 @@
 
 #define PNG_INTERNAL
 #include "png.h"
+#include "pnglibconf.h"
+#include "pngconf.h"
+#include "pngstruct.h"
+#include "pnginfo.h"
 
 #define PNG_CLEANUP                                                        \
   if (png_handler.png_ptr) {                                               \
@@ -78,10 +82,40 @@ void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
 
 static const int kPngHeaderSize = 8;
 
+void vectorize_png_handler(PngObjectHandler png_handler, uint8_t* data) {
+  // png_structp png_ptr = nullptr;
+  // png_infop   end_info_ptr = nullptr;
+  // png_voidp   row_ptr = nullptr;
+  // BufState   *buf_state = nullptr;
+
+  uint8_t result[10];
+  memset(result, 0, sizeof result);
+  int i = 0;
+
+  result[i++] = png_handler.info_ptr != nullptr;
+  result[i++] = png_handler.png_ptr != nullptr;
+  result[i++] = png_handler.end_info_ptr != nullptr;
+  result[i++] = png_handler.row_ptr != nullptr;
+  result[i++] = png_handler.buf_state != nullptr;
+
+  result[i++] = png_handler.info_ptr != nullptr && png_handler.info_ptr->palette != nullptr;
+  result[i++] = png_handler.end_info_ptr != nullptr && png_handler.end_info_ptr->palette != nullptr;
+  result[i++] = png_handler.buf_state != nullptr && png_handler.buf_state->bytes_left;
+
+  printf("vector: ");
+  for(int j = 0; j < i; j++) {
+    printf("%d ", result[j]);
+  }
+  printf("\n");
+
+  memcpy(data, result, i);
+}
+
 // Entry point for LibFuzzer.
 // Roughly follows the libpng book example:
 // http://www.libpng.org/pub/png/book/chapter13.html
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+extern "C" int LLVMFuzzerTestOneInput(uint8_t *data, size_t size) {
+  printf("andrew is here\n");
   if (size < kPngHeaderSize) { return 0; }
 
   std::vector<unsigned char> v(data, data + size);
@@ -185,6 +219,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
+
+  vectorize_png_handler(png_handler, data);
+  // printf("%x\n", vectorize_png_handler(png_handler));
 
   PNG_CLEANUP
   return 0;

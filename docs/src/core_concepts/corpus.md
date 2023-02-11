@@ -8,4 +8,4 @@ Usually, a testcase is added to the Corpus when it is considered as interesting,
 
 Related to the Corpus, there is the way in which the fuzzer should ask for the next testcase to fuzz picking it from the Corpus. The taxonomy for this in LibAFL is CorpusScheduler, the entity representing the policy to pop testcases from the Corpus, FIFO for instance.
 
-Speaking about the code, [`Corpus`](https://docs.rs/libafl/0/libafl/corpus/trait.Corpus.html) and [`CorpusScheduler`](https://docs.rs/libafl/0/libafl/corpus/trait.CorpusScheduler.html) are traits.
+Speaking about the code, [`Corpus`](https://docs.rs/libafl/0/libafl/corpus/trait.Corpus.html) and [`Scheduler`](https://docs.rs/libafl/0/libafl/schedulers/trait.Scheduler.html) are traits.

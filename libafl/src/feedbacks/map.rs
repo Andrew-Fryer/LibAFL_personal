@@ -688,6 +688,9 @@ where
         let history_map = map_state.history_map.as_mut_slice();
 
         for (i, (item, history)) in observer.as_iter().zip(history_map.iter_mut()).enumerate() {
+            // First, we find the combination (called `reduced`) of history and the current bitmap.
+            // Then, we see if the combination is different from history at all.
+            // I really hope this is optimized to one loop, because that would be really slow otherwise...
             let reduced = R::reduce(*history, *item);
             if N::is_novel(*history, reduced) {
                 *history = reduced;

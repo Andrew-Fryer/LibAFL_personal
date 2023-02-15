@@ -15,8 +15,9 @@ pub use prometheus::PrometheusMonitor;
 
 #[cfg(feature = "std")]
 pub mod disk;
-use alloc::{fmt::Debug, string::String, vec::Vec};
+use alloc::{fmt::Debug, string::{String, ToString}, vec::Vec};
 use core::{fmt, time::Duration};
+use std::{fs::File, io::Write};
 
 #[cfg(feature = "std")]
 pub use disk::{OnDiskJSONMonitor, OnDiskTOMLMonitor};
@@ -224,6 +225,22 @@ pub trait Monitor {
         self.client_stats_mut()
             .iter_mut()
             .fold(0_u64, |acc, x| acc + x.execs_per_sec(cur_time))
+    }
+
+    /// Percentage of the bit map that has been covered
+    #[inline]
+    fn map_coverage(&mut self) -> (f64, u64) {
+        let mut num_clients = 0;
+        let mut total_filled = 0;
+        let mut total_len = 0;
+        for client_stat in self.client_stats_mut().iter_mut() {
+            num_clients += 1;
+            if let Some(UserStats::Ratio(filled, len)) = client_stat.user_monitor.get(&"shared_mem".to_string()) {
+                total_filled += filled;
+                total_len += len;
+            }
+        }
+        (total_filled as f64 / num_clients as f64, total_len / num_clients)
     }
 
     /// The client monitor for a specific id, creating new if it doesn't exist
@@ -436,6 +453,87 @@ where
             start_time,
             client_stats: vec![],
         }
+    }
+}
+
+/// Tracking SUT coverage during fuzzing.
+// #[derive(Clone)]
+pub struct CoverageMonitor<F>
+where
+    F: FnMut(String),
+{
+    print_fn: F,
+    progress_log_file: File,
+    start_time: Duration,
+    client_stats: Vec<ClientStats>,
+}
+
+impl<F> Debug for CoverageMonitor<F>
+where
+    F: FnMut(String),
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SimpleMonitor")
+            .field("progress_log_file", &self.progress_log_file)
+            .field("client_stats", &self.client_stats)
+            .finish()
+    }
+}
+
+impl<F> Monitor for CoverageMonitor<F>
+where
+    F: FnMut(String),
+{
+    /// the client monitor, mutable
+    fn client_stats_mut(&mut self) -> &mut Vec<ClientStats> {
+        &mut self.client_stats
+    }
+
+    /// the client monitor
+    fn client_stats(&self) -> &[ClientStats] {
+        &self.client_stats
+    }
+
+    /// Time this fuzzing run stated
+    fn start_time(&mut self) -> Duration {
+        self.start_time
+    }
+
+    fn display(&mut self, event_msg: String, sender_id: u32) {
+        let total_execs = self.total_execs();
+        let coverage_data = self.map_coverage();
+        let fmt = format!(
+            "[{} #{}] run time: {}, clients: {}, corpus: {}, objectives: {}, executions: {}, exec/sec: {}, map coverage: {} / {}",
+            event_msg,
+            sender_id,
+            format_duration_hms(&(current_time() - self.start_time)),
+            self.client_stats().len(),
+            self.corpus_size(),
+            self.objective_size(),
+            total_execs,
+            self.execs_per_sec(),
+            coverage_data.0,
+            coverage_data.1
+        );
+        (self.print_fn)(fmt);
+
+        let csv_row = format!("{}, {}, {}\n", total_execs, coverage_data.0, coverage_data.1);
+        self.progress_log_file.write_all(csv_row.as_bytes()).unwrap();
+    }
+}
+
+impl<F> CoverageMonitor<F>
+where
+    F: FnMut(String),
+{
+    /// Creates the monitor, using the `current_time` as `start_time`.
+    pub fn new(print_fn: F, path: &str) -> std::io::Result<Self> {
+        Ok(Self {
+            print_fn,
+            progress_log_file: File::create(path)?,
+            start_time: current_time(),
+            client_stats: vec![],
+        })
     }
 }
 

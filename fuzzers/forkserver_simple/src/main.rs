@@ -25,7 +25,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback},
 };
 use nix::sys::signal::Signal;
 
@@ -40,7 +40,8 @@ struct Opt {
     #[arg(
         help = "The instrumented binary we want to fuzz",
         name = "EXEC",
-        default_value = "./target/release/program"
+        default_value = "./knotd_stdio"
+        // default_value = "./target/release/program"
     )]
     executable: String,
 
@@ -55,7 +56,7 @@ struct Opt {
         help = "Timeout for each individual execution, in milliseconds",
         short = 't',
         long = "timeout",
-        default_value = "1200"
+        default_value = "10000"
     )]
     timeout: u64,
 
@@ -63,7 +64,8 @@ struct Opt {
         help = "If not set, the child's stdout and stderror will be redirected to /dev/null",
         short = 'd',
         long = "debug-child",
-        default_value = "true"
+        // default_value = "true"
+        default_value = "false"
     )]
     debug_child: bool,
 
@@ -113,6 +115,7 @@ pub fn main() {
     let mut feedback = feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state
         MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        ConstFeedback::True,
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     );
@@ -122,7 +125,7 @@ pub fn main() {
     let mut objective = feedback_and_fast!(
         // Must be a crash
         CrashFeedback::new(),
-        // Take it onlt if trigger new coverage over crashes
+        // Take it only if trigger new coverage over crashes
         MaxMapFeedback::new(&edges_observer)
     );
 
@@ -144,14 +147,15 @@ pub fn main() {
     .unwrap();
 
     // The Monitor trait define how the fuzzer stats are reported to the user
-    let monitor = SimpleMonitor::new(|s| println!("{}", s));
+    let monitor = CoverageMonitor::new(|s| println!("{}", s), &"./coverage.csv").expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop
     // such as the notification of the addition of a new item to the corpus
     let mut mgr = SimpleEventManager::new(monitor);
 
     // A minimization+queue policy to get testcasess from the corpus
-    let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
+    // let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
+    let scheduler = QueueScheduler::new();
 
     // A fuzzer with feedbacks and a corpus scheduler
     let mut fuzzer = StdFuzzer::new(scheduler, feedback, objective);

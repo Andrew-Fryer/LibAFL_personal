@@ -66,6 +66,7 @@ where
             mark_feature_time!(state, PerfFeature::Mutate);
 
             // Time is measured directly the `evaluate_input` function
+            // here
             let (_, corpus_idx) = fuzzer.evaluate_input(state, executor, manager, input)?;
 
             start_timer!(state);

@@ -113,6 +113,7 @@ impl InputFile {
 
     /// Writes the given buffer to the file
     pub fn write_buf(&mut self, buf: &[u8]) -> Result<(), Error> {
+        // I suspect that this isn't causing the OS to trigger the POLLIN or POLLHUP signal that Knot is waiting for.
         self.rewind()?;
         self.file.write_all(buf)?;
         self.file.set_len(buf.len() as u64)?;

@@ -25,7 +25,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver},
 };
 use nix::sys::signal::Signal;
 
@@ -64,8 +64,8 @@ struct Opt {
         help = "If not set, the child's stdout and stderror will be redirected to /dev/null",
         short = 'd',
         long = "debug-child",
-        // default_value = "true"
-        default_value = "false"
+        default_value = "true"
+        // default_value = "false"
     )]
     debug_child: bool,
 
@@ -115,7 +115,7 @@ pub fn main() {
     let mut feedback = feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state
         MaxMapFeedback::new_tracking(&edges_observer, true, false),
-        ConstFeedback::True,
+        // ConstFeedback::True,
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     );
@@ -154,8 +154,8 @@ pub fn main() {
     let mut mgr = SimpleEventManager::new(monitor);
 
     // A minimization+queue policy to get testcasess from the corpus
-    // let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
-    let scheduler = QueueScheduler::new();
+    let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
+    // let scheduler = QueueScheduler::new();
 
     // A fuzzer with feedbacks and a corpus scheduler
     let mut fuzzer = StdFuzzer::new(scheduler, feedback, objective);
@@ -174,6 +174,8 @@ pub fn main() {
         .autotokens(&mut tokens)
         .parse_afl_cmdline(args)
         .coverage_map_size(MAP_SIZE)
+        .is_persistent(true)
+        .pipe_input(true)
         .build(tuple_list!(time_observer, edges_observer))
         .unwrap();
 
@@ -185,10 +187,13 @@ pub fn main() {
             .downsize_map(dynamic_map_size);
     }
 
+    let forkserver_input_pipe = forkserver.input_pipe();
     let mut executor = TimeoutForkserverExecutor::with_signal(
         forkserver,
         Duration::from_millis(opt.timeout),
         opt.signal,
+        true,
+        forkserver_input_pipe,
     )
     .expect("Failed to create the executor.");
 

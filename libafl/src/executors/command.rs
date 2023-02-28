@@ -24,7 +24,7 @@ use crate::{
     bolts::{
         fs::{InputFile, INPUTFILE_STD},
         tuples::MatchName,
-        AsSlice,
+        AsSlice, bolts_prelude::pipes::Pipe,
     },
     inputs::{HasTargetBytes, UsesInput},
     observers::{ObserversTuple, UsesObservers},
@@ -37,6 +37,7 @@ use crate::{inputs::Input, Error};
 /// How to deliver input to an external program
 /// `StdIn`: The target reads from stdin
 /// `File`: The target reads from the specified [`InputFile`]
+/// `Pipe`: The target reads from the specified [`Pipe`]???
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InputLocation {
     /// Mutate a commandline argument to deliver an input
@@ -52,6 +53,7 @@ pub enum InputLocation {
         /// The file to write input to. The target should read input from this location.
         out_file: InputFile,
     },
+    Pipe (Pipe), // this is for SUTs that use poll on their stdin
 }
 
 /// Clones a [`Command`] (without stdio and stdout/stderr - they are not accesible)
@@ -143,6 +145,9 @@ impl CommandConfigurator for StdCommandConfigurator {
             InputLocation::File { out_file } => {
                 out_file.write_buf(input.target_bytes().as_slice())?;
                 Ok(self.command.spawn()?)
+            }
+            InputLocation::Pipe(pipe) => {
+                todo!()
             }
         }
     }
@@ -543,7 +548,7 @@ impl CommandExecutorBuilder {
 
         let mut command = Command::new(program);
         match &self.input_location {
-            InputLocation::StdIn => {
+            InputLocation::StdIn | InputLocation::Pipe(_) => {
                 command.stdin(Stdio::piped());
             }
             InputLocation::File { .. } | InputLocation::Arg { .. } => {

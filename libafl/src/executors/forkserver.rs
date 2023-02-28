@@ -1,17 +1,18 @@
 //! Expose an `Executor` based on a `Forkserver` in order to execute AFL/AFL++ binaries
 
-use alloc::{borrow::ToOwned, string::ToString, vec::Vec};
+use alloc::{borrow::ToOwned, string::ToString, vec::Vec, rc::Rc};
 use core::{
     fmt::{self, Debug, Formatter},
     marker::PhantomData,
-    time::Duration,
+    time::Duration, cell::RefCell,
 };
 use std::{
     ffi::{OsStr, OsString},
     io::{self, prelude::*, ErrorKind},
-    os::unix::{io::RawFd, process::CommandExt},
+    os::unix::{io::{FromRawFd, RawFd}, process::CommandExt},
     path::Path,
     process::{Command, Stdio},
+    fs::File,
 };
 
 use nix::{
@@ -391,6 +392,8 @@ pub trait HasForkserver {
 #[derive(Debug)]
 pub struct TimeoutForkserverExecutor<E> {
     executor: E,
+    pipe_input: bool,
+    input_pipe: Option<Rc<RefCell<Pipe>>>,
     timeout: TimeSpec,
     signal: Signal,
 }
@@ -399,15 +402,17 @@ impl<E> TimeoutForkserverExecutor<E> {
     /// Create a new [`TimeoutForkserverExecutor`]
     pub fn new(executor: E, exec_tmout: Duration) -> Result<Self, Error> {
         let signal = Signal::SIGKILL;
-        Self::with_signal(executor, exec_tmout, signal)
+        Self::with_signal(executor, exec_tmout, signal, false, None)
     }
 
     /// Create a new [`TimeoutForkserverExecutor`] that sends a user-defined signal to the timed-out process
-    pub fn with_signal(executor: E, exec_tmout: Duration, signal: Signal) -> Result<Self, Error> {
+    pub fn with_signal(executor: E, exec_tmout: Duration, signal: Signal, pipe_input: bool, input_pipe: Option<Rc<RefCell<Pipe>>>) -> Result<Self, Error> {
         let milli_sec = exec_tmout.as_millis() as i64;
         let timeout = TimeSpec::milliseconds(milli_sec);
         Ok(Self {
             executor,
+            pipe_input,
+            input_pipe,
             timeout,
             signal,
         })
@@ -421,7 +426,7 @@ where
     EM: UsesState<State = E::State>,
     Z: UsesState<State = E::State>,
 {
-    #[inline]
+    // #[inline]
     fn run_target(
         &mut self,
         _fuzzer: &mut Z,
@@ -430,6 +435,7 @@ where
         input: &Self::Input,
     ) -> Result<ExitKind, Error> {
         let mut exit_kind = ExitKind::Ok;
+        println!("in TimeoutForkserverExecutor");
 
         let last_run_timed_out = self.executor.forkserver().last_run_timed_out();
 
@@ -442,6 +448,14 @@ where
             shmem.as_mut_slice()[..4].copy_from_slice(&size_in_bytes[..4]);
             shmem.as_mut_slice()[SHMEM_FUZZ_HDR_SIZE..(SHMEM_FUZZ_HDR_SIZE + size)]
                 .copy_from_slice(target_bytes.as_slice());
+        } else if self.pipe_input {
+            if let Some(pipe) = &self.input_pipe {
+                let len = pipe.borrow_mut().write(input.target_bytes().as_slice())?;
+                // let's hope that len is the full length...
+                assert!(len == input.target_bytes().as_slice().len());
+            } else {
+                panic!();
+            }
         } else {
             self.executor
                 .input_file_mut()
@@ -451,7 +465,7 @@ where
         let send_len = self
             .executor
             .forkserver_mut()
-            .write_ctl(last_run_timed_out)?;
+            .write_ctl(last_run_timed_out)?; // The target actually runs when we send this control signal
 
         self.executor.forkserver_mut().set_last_run_timed_out(0);
 
@@ -518,6 +532,8 @@ where
     args: Vec<OsString>,
     input_file: InputFile,
     uses_shmem_testcase: bool,
+    pipe_input: bool,
+    input_pipe: Option<Rc<RefCell<Pipe>>>,
     forkserver: Forkserver,
     observers: OT,
     map: Option<SP::ShMem>,
@@ -583,6 +599,10 @@ where
     pub fn coverage_map_size(&self) -> Option<usize> {
         self.map_size
     }
+
+    pub fn input_pipe(&self) -> Option<Rc<RefCell<Pipe>>> {
+        self.input_pipe.clone().map(|rc| rc.clone())
+    }
 }
 
 /// The builder for `ForkserverExecutor`
@@ -595,6 +615,8 @@ pub struct ForkserverExecutorBuilder<'a, SP> {
     debug_child: bool,
     use_stdin: bool,
     uses_shmem_testcase: bool,
+    pipe_input: bool,
+    input_pipe: Option<Rc<RefCell<Pipe>>>,
     is_persistent: bool,
     is_deferred_frksrv: bool,
     autotokens: Option<&'a mut Tokens>,
@@ -629,6 +651,8 @@ impl<'a, SP> ForkserverExecutorBuilder<'a, SP> {
             args: self.arguments.clone(),
             input_file,
             uses_shmem_testcase: self.uses_shmem_testcase,
+            pipe_input: self.pipe_input,
+            input_pipe: self.input_pipe.clone().map(|rc| rc.clone()),
             forkserver,
             observers,
             map,
@@ -674,6 +698,8 @@ impl<'a, SP> ForkserverExecutorBuilder<'a, SP> {
             args: self.arguments.clone(),
             input_file,
             uses_shmem_testcase: self.uses_shmem_testcase,
+            pipe_input: self.pipe_input,
+            input_pipe: self.input_pipe.clone().map(|rc| rc.clone()),
             forkserver,
             observers,
             map,
@@ -695,6 +721,15 @@ impl<'a, SP> ForkserverExecutorBuilder<'a, SP> {
 
         let input_file = InputFile::create(input_filename)?;
 
+        let input_fd = if self.pipe_input {
+            let input_pipe = Pipe::new()?;
+            let input_fd = input_pipe.read_end().unwrap(); // todo use ?
+            self.input_pipe = Some(Rc::new(RefCell::new(input_pipe)));
+            input_fd
+        } else {
+            input_file.as_raw_fd()
+        };
+
         let map = match &mut self.shmem_provider {
             None => None,
             Some(provider) => {
@@ -713,7 +748,7 @@ impl<'a, SP> ForkserverExecutorBuilder<'a, SP> {
                 t.clone(),
                 self.arguments.clone(),
                 self.envs.clone(),
-                input_file.as_raw_fd(),
+                input_fd,
                 self.use_stdin,
                 0,
                 self.is_persistent,
@@ -806,7 +841,7 @@ impl<'a, SP> ForkserverExecutorBuilder<'a, SP> {
             println!("Forkserver Options are not available.");
         }
 
-        Ok((forkserver, input_file, map))
+        Ok((forkserver, input_file, map)) // who looks at input_file now?...
     }
 
     /// Use autodict?
@@ -863,6 +898,8 @@ impl<'a> ForkserverExecutorBuilder<'a, UnixShMemProvider> {
             debug_child: false,
             use_stdin: false,
             uses_shmem_testcase: false,
+            pipe_input: false,
+            input_pipe: None,
             is_persistent: false,
             is_deferred_frksrv: false,
             autotokens: None,
@@ -978,6 +1015,11 @@ impl<'a> ForkserverExecutorBuilder<'a, UnixShMemProvider> {
         self
     }
 
+    pub fn pipe_input(mut self, pipe_input: bool) -> Self {
+        self.pipe_input = pipe_input;
+        self
+    }
+
     /// Shmem provider for forkserver's shared memory testcase feature.
     pub fn shmem_provider<SP: ShMemProvider>(
         self,
@@ -990,6 +1032,8 @@ impl<'a> ForkserverExecutorBuilder<'a, UnixShMemProvider> {
             debug_child: self.debug_child,
             use_stdin: self.use_stdin,
             uses_shmem_testcase: self.uses_shmem_testcase,
+            pipe_input: self.pipe_input,
+            input_pipe: self.input_pipe,
             is_persistent: self.is_persistent,
             is_deferred_frksrv: self.is_deferred_frksrv,
             autotokens: self.autotokens,
@@ -1016,7 +1060,7 @@ where
     EM: UsesState<State = S>,
     Z: UsesState<State = S>,
 {
-    #[inline]
+    // #[inline]
     fn run_target(
         &mut self,
         _fuzzer: &mut Z,
@@ -1025,6 +1069,7 @@ where
         input: &Self::Input,
     ) -> Result<ExitKind, Error> {
         let mut exit_kind = ExitKind::Ok;
+        println!("in ForkserverExecutor");
 
         // Write to testcase
         if self.uses_shmem_testcase {
@@ -1037,6 +1082,13 @@ where
                 .copy_from_slice(&size_in_bytes[..SHMEM_FUZZ_HDR_SIZE]);
             map.as_mut_slice()[SHMEM_FUZZ_HDR_SIZE..(SHMEM_FUZZ_HDR_SIZE + size)]
                 .copy_from_slice(target_bytes.as_slice());
+        } else if self.pipe_input {
+            if let Some(pipe) = &self.input_pipe {
+                let len = pipe.borrow_mut().write(input.target_bytes().as_slice())?;
+                // let's hope that len is the full length...
+            } else {
+                panic!();
+            }
         } else {
             self.input_file.write_buf(input.target_bytes().as_slice())?;
         }

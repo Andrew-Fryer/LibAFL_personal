@@ -51,7 +51,7 @@ where
 /// The target/forkserver will read from this file.
 #[cfg(feature = "std")]
 #[derive(Debug)]
-pub struct InputFile {
+pub struct InputFile { // I want to change this so that it could be a file on disk, or it could be a pipe...
     /// The filename/path too this [`InputFile`]
     pub path: PathBuf,
     /// The underlying file that got created
@@ -145,6 +145,8 @@ impl Drop for InputFile {
         }
     }
 }
+
+// here
 
 #[cfg(test)]
 mod test {

@@ -12,7 +12,7 @@ use crate::Error;
 
 /// A unix pipe wrapper for `LibAFL`
 #[cfg(feature = "std")]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Pipe {
     /// The read end of the pipe
     read_end: Option<RawFd>,

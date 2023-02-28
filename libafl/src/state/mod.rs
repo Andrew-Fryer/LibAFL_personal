@@ -364,7 +364,9 @@ where
         EM: UsesState<State = Self>,
         Z: Evaluator<E, EM, State = Self>,
     {
-        for entry in fs::read_dir(in_dir)? {
+        let dir_obj = fs::read_dir(in_dir)?;
+        let dir_iter = dir_obj.into_iter();
+        for entry in dir_iter {
             let entry = entry?;
             let path = entry.path();
             let attributes = fs::metadata(&path);
@@ -390,7 +392,6 @@ where
                 self.load_from_directory(fuzzer, executor, manager, &path, forced, loader)?;
             }
         }
-
         Ok(())
     }
 

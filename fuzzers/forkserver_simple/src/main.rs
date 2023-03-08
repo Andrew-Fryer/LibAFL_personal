@@ -26,35 +26,9 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr},
 };
 use nix::sys::signal::Signal;
-
-
-#[derive(Clone, Debug)]
-enum FeedbackConfig {
-    Const,
-    AflEdges,
-    InputGrammar,
-    OutputGrammar,
-    FullGrammar,
-}
-
-impl FromStr for FeedbackConfig {
-    type Err = &'static str;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "Const" => FeedbackConfig::Const,
-            "AflEdges" => FeedbackConfig::Const,
-            "InputGrammar" => FeedbackConfig::Const,
-            "OuputGrammar" => FeedbackConfig::Const,
-            "FullGrammar" => FeedbackConfig::Const,
-            _ => {
-                return Err(&"Failed to parse FeedbackConfig");
-            },
-        })
-    }
-}
 
 /// The commandline args this fuzzer accepts
 #[derive(Debug, Parser)]
@@ -112,15 +86,6 @@ struct Opt {
         default_value = "SIGKILL"
     )]
     signal: Signal,
-
-    #[arg(
-        help = "Signal used to stop child",
-        short = 'f',
-        long = "feedback",
-        value_parser = str::parse::<FeedbackConfig>,
-        default_value = "Const"
-    )]
-    feedback_config: FeedbackConfig,
 }
 
 #[allow(clippy::similar_names)]
@@ -150,32 +115,36 @@ pub fn main() {
 
     // Feedback to rate the interestingness of an input
     // This one is composed by two Feedbacks in OR
-    let mut feedback: Box<dyn Feedback<_>> = Box::new(match &opt.feedback_config {
-        // let mut feedback: Box<dyn Feedback<S, S: UsesInput + HasClientPerfMonitor>> = Box::new(match &opt.feedback_config {
-        FeedbackConfig::AflEdges => feedback_or!(
-            // New maximization map feedback linked to the edges observer and the feedback state
-            MaxMapFeedback::new_tracking(&edges_observer, true, false),
-            // Time feedback, this one does not need a feedback state
-            TimeFeedback::new_with_observer(&time_observer)
-        ),
-        // FeedbackConfig::Const => feedback_or!(
-        //     // New maximization map feedback linked to the edges observer and the feedback state
-        //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
-        //     ConstFeedback::True,
-        //     // Time feedback, this one does not need a feedback state
-        //     TimeFeedback::new_with_observer(&time_observer)
-        // ),
-        // FeedbackConfig::Grammar => feedback_or!(
-        //     // New maximization map feedback linked to the edges observer and the feedback state
-        //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
-        //     OutputFeedback::new_with_observer(&output_observer),
-        //     // Time feedback, this one does not need a feedback state
-        //     TimeFeedback::new_with_observer(&time_observer)
-        // ),
-        _ => {
-            todo!();
-        },
-    });
+    // let afl_edges_feedback = (&"AflEdges", feedback_or!(
+    //     // New maximization map feedback linked to the edges observer and the feedback state
+    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //     // Time feedback, this one does not need a feedback state
+    //     TimeFeedback::new_with_observer(&time_observer)
+    // ));
+    let const_feedback = (&"ConstTrue", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        ConstFeedback::True,
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
+    // let grammar_input_feedback = (&"GrammarInput", feedback_or!(
+    //     // New maximization map feedback linked to the edges observer and the feedback state
+    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //     OutputFeedback::new_with_observer(&output_observer),
+    //     // Time feedback, this one does not need a feedback state
+    //     TimeFeedback::new_with_observer(&time_observer)
+    // ));
+    // let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
+    //     // New maximization map feedback linked to the edges observer and the feedback state
+    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //     OutputFeedback::new_with_observer(&output_observer), // todo: modify to actually use grammar
+    //     // Time feedback, this one does not need a feedback state
+    //     TimeFeedback::new_with_observer(&time_observer)
+    // ));
+
+    // Change the following line to run different feecbacks
+    let (feedback_name, mut feedback) = const_feedback;
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does
@@ -204,9 +173,8 @@ pub fn main() {
     .unwrap();
 
     // The Monitor trait define how the fuzzer stats are reported to the user
-    let config = opt.feedback_config;
     let timestamp = OffsetDateTime::now_utc();
-    let coverage_file = format!("./coverage_{:?}_{}.csv", config, timestamp);
+    let coverage_file = format!("./coverage_{:?}_{}.csv", feedback_name, timestamp);
     let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop
@@ -214,8 +182,8 @@ pub fn main() {
     let mut mgr = SimpleEventManager::new(monitor);
 
     // A minimization+queue policy to get testcasess from the corpus
-    let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
-    // let scheduler = QueueScheduler::new();
+    // let scheduler = IndexesLenTimeMinimizerScheduler::new(QueueScheduler::new());
+    let scheduler = QueueScheduler::new();
 
     // A fuzzer with feedbacks and a corpus scheduler
     let mut fuzzer = StdFuzzer::new(scheduler, feedback, objective);

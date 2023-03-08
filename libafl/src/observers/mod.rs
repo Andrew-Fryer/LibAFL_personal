@@ -29,6 +29,7 @@ use alloc::{
     vec::Vec,
 };
 use core::{fmt::Debug, time::Duration};
+use std::fs; // todo: I should probably change this so that we can compile for no std
 
 use serde::{Deserialize, Serialize};
 pub use value::*;
@@ -465,6 +466,73 @@ impl Named for TimeObserver {
 }
 
 impl<OTA, OTB, S> DifferentialObserver<OTA, OTB, S> for TimeObserver
+where
+    OTA: ObserversTuple<S>,
+    OTB: ObserversTuple<S>,
+    S: UsesInput,
+{
+}
+
+/// Analyzes the output of the SUT
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct OutputObserver {
+    name: String,
+    last_output: Option<Vec<u8>>,
+}
+
+impl OutputObserver {
+    /// Creates a new [`OutputObserver`] with the given name.
+    #[must_use]
+    pub fn new(name: &'static str) -> Self {
+        Self {
+            name: name.to_string(),
+            last_output: None,
+        }
+    }
+    pub fn last_output(&self) -> &Option<Vec<u8>> {
+        &self.last_output
+    }
+    // pub fn take_last_output(&mut self) -> Option<Vec<u8>> {
+    //     let result = self.last_output;
+    //     self.last_output = None;
+    //     result
+    // }
+}
+
+impl<S> Observer<S> for OutputObserver
+where
+    S: UsesInput,
+{
+    fn pre_exec(&mut self, _state: &mut S, _input: &S::Input) -> Result<(), Error> {
+        // I could change this to be a grammar observer and then this would compute a FV of the input.
+        Ok(())
+    }
+
+    fn post_exec(
+        &mut self,
+        _state: &mut S,
+        _input: &S::Input,
+        _exit_kind: &ExitKind,
+    ) -> Result<(), Error> {
+        // let map_state = state
+        //     .named_metadata_mut()
+        //     .get_mut::<MapFeedbackMetadata<u8>>(&self.name)
+        //     .unwrap();
+        let output_data = fs::read("output")?; // todo: rename to .cur_input?
+        // let mut fv = Vec::new();
+        // self.last_output = Some(fv);
+        self.last_output = Some(output_data);
+        Ok(())
+    }
+}
+
+impl Named for OutputObserver {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl<OTA, OTB, S> DifferentialObserver<OTA, OTB, S> for OutputObserver
 where
     OTA: ObserversTuple<S>,
     OTB: ObserversTuple<S>,

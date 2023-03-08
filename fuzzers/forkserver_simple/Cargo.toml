@@ -19,3 +19,4 @@ opt-level = 3
 libafl = { path = "../../libafl/", features = ["std", "derive"] }
 clap = { version = "4.0", features = ["derive"] }
 nix = "0.25"
+time = { version = "0.3", features = ["macros"] }

@@ -1,5 +1,6 @@
 use core::time::Duration;
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr};
+use time::OffsetDateTime;
 
 use clap::{self, Parser};
 use libafl::{
@@ -25,9 +26,35 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback},
 };
 use nix::sys::signal::Signal;
+
+
+#[derive(Clone, Debug)]
+enum FeedbackConfig {
+    Const,
+    AflEdges,
+    InputGrammar,
+    OutputGrammar,
+    FullGrammar,
+}
+
+impl FromStr for FeedbackConfig {
+    type Err = &'static str;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "Const" => FeedbackConfig::Const,
+            "AflEdges" => FeedbackConfig::Const,
+            "InputGrammar" => FeedbackConfig::Const,
+            "OuputGrammar" => FeedbackConfig::Const,
+            "FullGrammar" => FeedbackConfig::Const,
+            _ => {
+                return Err(&"Failed to parse FeedbackConfig");
+            },
+        })
+    }
+}
 
 /// The commandline args this fuzzer accepts
 #[derive(Debug, Parser)]
@@ -85,6 +112,15 @@ struct Opt {
         default_value = "SIGKILL"
     )]
     signal: Signal,
+
+    #[arg(
+        help = "Signal used to stop child",
+        short = 'f',
+        long = "feedback",
+        value_parser = str::parse::<FeedbackConfig>,
+        default_value = "Const"
+    )]
+    feedback_config: FeedbackConfig,
 }
 
 #[allow(clippy::similar_names)]
@@ -110,15 +146,35 @@ pub fn main() {
     // Create an observation channel to keep track of the execution time
     let time_observer = TimeObserver::new("time");
 
+    let output_observer = OutputObserver::new("output");
+
     // Feedback to rate the interestingness of an input
     // This one is composed by two Feedbacks in OR
-    let mut feedback = feedback_or!(
-        // New maximization map feedback linked to the edges observer and the feedback state
-        MaxMapFeedback::new_tracking(&edges_observer, true, false),
-        // ConstFeedback::True,
-        // Time feedback, this one does not need a feedback state
-        TimeFeedback::new_with_observer(&time_observer)
-    );
+    let mut feedback = match &opt.feedback_config {
+        FeedbackConfig::AflEdges => feedback_or!(
+            // New maximization map feedback linked to the edges observer and the feedback state
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            // Time feedback, this one does not need a feedback state
+            TimeFeedback::new_with_observer(&time_observer)
+        ),
+        FeedbackConfig::Const => feedback_or!(
+            // New maximization map feedback linked to the edges observer and the feedback state
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            ConstFeedback::True,
+            // Time feedback, this one does not need a feedback state
+            TimeFeedback::new_with_observer(&time_observer)
+        ),
+        // FeedbackConfig::Grammar => feedback_or!(
+        //     // New maximization map feedback linked to the edges observer and the feedback state
+        //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        //     OutputFeedback::new_with_observer(&output_observer),
+        //     // Time feedback, this one does not need a feedback state
+        //     TimeFeedback::new_with_observer(&time_observer)
+        // ),
+        _ => {
+            todo!();
+        },
+    };
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does
@@ -147,7 +203,10 @@ pub fn main() {
     .unwrap();
 
     // The Monitor trait define how the fuzzer stats are reported to the user
-    let monitor = CoverageMonitor::new(|s| println!("{}", s), &"./coverage.csv").expect("successfully created CoverageMonitor");
+    let config = opt.feedback_config;
+    let timestamp = OffsetDateTime::now_utc();
+    let coverage_file = format!("./coverage_{:?}_{}.csv", config, timestamp);
+    let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop
     // such as the notification of the addition of a new item to the corpus
@@ -176,7 +235,7 @@ pub fn main() {
         .coverage_map_size(MAP_SIZE)
         .is_persistent(true)
         .pipe_input(true)
-        .build(tuple_list!(time_observer, edges_observer))
+        .build(tuple_list!(time_observer, edges_observer, output_observer))
         .unwrap();
 
     if let Some(dynamic_map_size) = forkserver.coverage_map_size() {

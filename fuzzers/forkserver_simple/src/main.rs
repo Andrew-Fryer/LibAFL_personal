@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput},
 };
 use nix::sys::signal::Signal;
 
@@ -150,20 +150,21 @@ pub fn main() {
 
     // Feedback to rate the interestingness of an input
     // This one is composed by two Feedbacks in OR
-    let mut feedback = match &opt.feedback_config {
+    let mut feedback: Box<dyn Feedback<_>> = Box::new(match &opt.feedback_config {
+        // let mut feedback: Box<dyn Feedback<S, S: UsesInput + HasClientPerfMonitor>> = Box::new(match &opt.feedback_config {
         FeedbackConfig::AflEdges => feedback_or!(
             // New maximization map feedback linked to the edges observer and the feedback state
             MaxMapFeedback::new_tracking(&edges_observer, true, false),
             // Time feedback, this one does not need a feedback state
             TimeFeedback::new_with_observer(&time_observer)
         ),
-        FeedbackConfig::Const => feedback_or!(
-            // New maximization map feedback linked to the edges observer and the feedback state
-            MaxMapFeedback::new_tracking(&edges_observer, true, false),
-            ConstFeedback::True,
-            // Time feedback, this one does not need a feedback state
-            TimeFeedback::new_with_observer(&time_observer)
-        ),
+        // FeedbackConfig::Const => feedback_or!(
+        //     // New maximization map feedback linked to the edges observer and the feedback state
+        //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        //     ConstFeedback::True,
+        //     // Time feedback, this one does not need a feedback state
+        //     TimeFeedback::new_with_observer(&time_observer)
+        // ),
         // FeedbackConfig::Grammar => feedback_or!(
         //     // New maximization map feedback linked to the edges observer and the feedback state
         //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
@@ -174,7 +175,7 @@ pub fn main() {
         _ => {
             todo!();
         },
-    };
+    });
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does

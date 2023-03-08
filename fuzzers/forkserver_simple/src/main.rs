@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr},
+    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -111,6 +111,7 @@ pub fn main() {
     // Create an observation channel to keep track of the execution time
     let time_observer = TimeObserver::new("time");
 
+    let input_observer = InputObserver::new("input");
     let output_observer = OutputObserver::new("output");
 
     // Feedback to rate the interestingness of an input
@@ -121,20 +122,23 @@ pub fn main() {
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
-    let const_feedback = (&"ConstTrue", feedback_or!(
-        // New maximization map feedback linked to the edges observer and the feedback state
-        MaxMapFeedback::new_tracking(&edges_observer, true, false),
-        ConstFeedback::True,
-        // Time feedback, this one does not need a feedback state
-        TimeFeedback::new_with_observer(&time_observer)
-    ));
-    // let grammar_input_feedback = (&"GrammarInput", feedback_or!(
+    // let const_feedback = (&"ConstTrue", feedback_or!(
     //     // New maximization map feedback linked to the edges observer and the feedback state
     //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
-    //     OutputFeedback::new_with_observer(&output_observer),
+    //     ConstFeedback::True,
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
+    let grammar_input_feedback = (&"GrammarInput", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        feedback_and!(
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            ConstFeedback::False // this ensures that MaxMapFeedback doens't help us out
+        ),
+        InputFeedback::new_with_observer(&input_observer),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
     // let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
     //     // New maximization map feedback linked to the edges observer and the feedback state
     //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
@@ -144,7 +148,7 @@ pub fn main() {
     // ));
 
     // Change the following line to run different feecbacks
-    let (feedback_name, mut feedback) = const_feedback;
+    let (feedback_name, mut feedback) = grammar_input_feedback;
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does
@@ -204,7 +208,9 @@ pub fn main() {
         .coverage_map_size(MAP_SIZE)
         .is_persistent(true)
         .pipe_input(true)
-        .build(tuple_list!(time_observer, edges_observer, output_observer))
+        // .build(tuple_list!(time_observer, edges_observer))
+        .build(tuple_list!(time_observer, edges_observer, input_observer))
+        // .build(tuple_list!(time_observer, edges_observer, output_observer))
         .unwrap();
 
     if let Some(dynamic_map_size) = forkserver.coverage_map_size() {

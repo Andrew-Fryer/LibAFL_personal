@@ -34,6 +34,7 @@ use core::{
 pub use nautilus::*;
 use serde::{Deserialize, Serialize};
 
+use crate::observers::InputObserver;
 use crate::observers::OutputObserver;
 use crate::prelude::HasNamedMetadata;
 use crate::{
@@ -1092,8 +1093,104 @@ impl From<bool> for ConstFeedback {
     }
 }
 
-/// The [`OutputFeedback`] reports the same value, always.
-/// It can be used to enable or disable feedback results through composition.
+/// The [`InputFeedback`] uses input from the SUT
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InputFeedback {
+    // observer: OutputObserver, // todo: should I instead pull the observer out of `_observers` like MapFeedback does???
+        // like so: `let observer = observers.match_name::<O>(&self.observer_name).unwrap();`
+    name: String,
+    // I could put a grammar here
+}
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
+pub struct InputFeedbackMetadata {
+    fvs: Vec<Vec<u8>>,
+}
+
+crate::impl_serdeany!(
+    InputFeedbackMetadata
+);
+
+impl InputFeedbackMetadata {
+    pub fn new() -> Self {
+        Self {
+            fvs: Vec::new(),
+        }
+    }
+    pub fn fvs(&mut self) -> &mut Vec<Vec<u8>> {
+        &mut self.fvs
+    }
+}
+
+impl<S> Feedback<S> for InputFeedback
+where
+    // S: UsesInput + HasClientPerfMonitor,
+    S: UsesInput + HasClientPerfMonitor + HasNamedMetadata + Debug,
+{
+    fn init_state(&mut self, state: &mut S) -> Result<(), Error> {
+        state.add_named_metadata(InputFeedbackMetadata::new(), &self.name);
+        Ok(())
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn is_interesting<EM, OT>(
+        &mut self,
+        state: &mut S,
+        _manager: &mut EM,
+        _input: &S::Input,
+        observers: &OT,
+        _exit_kind: &ExitKind,
+    ) -> Result<bool, Error>
+    where
+        EM: EventFirer<State = S>,
+        OT: ObserversTuple<S>,
+    {
+        // let output = _state.introspection_monitor().
+
+        // I think that I can't just keep a reference to the observer in a field of self
+        // because then self won't implement Copy, and that makes it harder to serialize to disk.
+        // let observer = observers.match_name::<TimeObserver>(self.name()).unwrap();
+        // let observer = observers.match_name::<O>(&self.observer_name).unwrap();
+        let observer = observers.match_name::<InputObserver>(self.name()).unwrap();
+        if let Some(last_input) = observer.last_input() {
+            let input_history_state = state
+                .named_metadata_mut()
+                .get_mut::<OutputFeedbackMetadata>(&self.name)
+                .unwrap();
+            let fvs = input_history_state.fvs();
+
+            if fvs.contains(last_input) {
+                return Ok(false)
+            }
+            fvs.push(last_input.clone()); // todo: use the grammar to compute the fv rather than using the output directly
+        }
+
+        Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
+    }
+}
+
+impl Named for InputFeedback {
+    #[inline]
+    fn name(&self) -> &str {
+        self.name.as_str()
+    }
+}
+
+impl InputFeedback {
+    /// Creates a new [`InputFeedback`]
+    #[must_use]
+    pub fn new(name: String) -> Self {
+        Self {
+            // observer,
+            name,
+        }
+    }
+    pub fn new_with_observer(observer: &InputObserver) -> Self {
+        Self::new(observer.name().to_string())
+    }
+}
+
+/// The [`OutputFeedback`] uses output from the SUT
 // #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct OutputFeedback {
@@ -1178,7 +1275,7 @@ impl Named for OutputFeedback {
 }
 
 impl OutputFeedback {
-    /// Creates a new [`OutputFeedback`] from the given boolean
+    /// Creates a new [`OutputFeedback`]
     #[must_use]
     pub fn new(name: String) -> Self {
         Self {

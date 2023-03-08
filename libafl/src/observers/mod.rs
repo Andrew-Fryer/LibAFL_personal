@@ -473,6 +473,64 @@ where
 {
 }
 
+/// Analyzes the input of the SUT as a feature vector of the parse tree
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct InputObserver {
+    name: String,
+    last_input: Option<Vec<u8>>,
+}
+
+impl InputObserver {
+    /// Creates a new [`InputObserver`] with the given name.
+    #[must_use]
+    pub fn new(name: &'static str) -> Self {
+        Self {
+            name: name.to_string(),
+            last_input: None,
+        }
+    }
+    pub fn last_input(&self) -> &Option<Vec<u8>> {
+        &self.last_input
+    }
+}
+
+impl<S> Observer<S> for InputObserver
+where
+    S: UsesInput,
+{
+    fn pre_exec(&mut self, _state: &mut S, _input: &S::Input) -> Result<(), Error> {
+        // input.to_file(&".cur_input.input_observer");
+        // TODO: attache input as metadata to the run???
+
+        // TODO: actually, I'm not sure we need an InputObserver at all
+        // because the input is provided to the is_interesting function directly.
+        Ok(())
+    }
+
+    fn post_exec(
+        &mut self,
+        _state: &mut S,
+        _input: &S::Input,
+        _exit_kind: &ExitKind,
+    ) -> Result<(), Error> {
+        Ok(())
+    }
+}
+
+impl Named for InputObserver {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl<OTA, OTB, S> DifferentialObserver<OTA, OTB, S> for InputObserver
+where
+    OTA: ObserversTuple<S>,
+    OTB: ObserversTuple<S>,
+    S: UsesInput,
+{
+}
+
 /// Analyzes the output of the SUT
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OutputObserver {
@@ -518,7 +576,7 @@ where
         //     .named_metadata_mut()
         //     .get_mut::<MapFeedbackMetadata<u8>>(&self.name)
         //     .unwrap();
-        let output_data = fs::read("output")?; // todo: rename to .cur_input?
+        let output_data = fs::read("output")?; // todo: rename to .cur_output?
         // let mut fv = Vec::new();
         // self.last_output = Some(fv);
         self.last_output = Some(output_data);

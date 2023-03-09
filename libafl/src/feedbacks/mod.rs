@@ -4,6 +4,7 @@
 //! TODO: make S of Feedback<S> an associated type when specialisation + AT is stable
 
 pub mod map;
+use alloc::boxed::Box;
 use alloc::vec::Vec;
 pub use map::*;
 
@@ -29,14 +30,18 @@ use core::{
     marker::PhantomData,
     time::Duration,
 };
+use std::fs;
 
 #[cfg(feature = "nautilus")]
 pub use nautilus::*;
 use serde::{Deserialize, Serialize};
 
+use crate::inputs::BytesInput;
+use crate::inputs::HasBytesVec;
 use crate::observers::InputObserver;
 use crate::observers::OutputObserver;
 use crate::prelude::HasNamedMetadata;
+use crate::prelude::Input;
 use crate::{
     bolts::tuples::Named,
     corpus::Testcase,
@@ -1100,6 +1105,7 @@ pub struct InputFeedback {
         // like so: `let observer = observers.match_name::<O>(&self.observer_name).unwrap();`
     name: String,
     // I could put a grammar here
+    // grammar: Box<dyn DataModel>,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -1126,6 +1132,7 @@ impl<S> Feedback<S> for InputFeedback
 where
     // S: UsesInput + HasClientPerfMonitor,
     S: UsesInput + HasClientPerfMonitor + HasNamedMetadata + Debug,
+    S::Input: HasBytesVec, // I think this means that InputFeedback will only implement Feedback for S::Input types that implement HasBytesVec
 {
     fn init_state(&mut self, state: &mut S) -> Result<(), Error> {
         state.add_named_metadata(InputFeedbackMetadata::new(), &self.name);
@@ -1137,7 +1144,7 @@ where
         &mut self,
         state: &mut S,
         _manager: &mut EM,
-        _input: &S::Input,
+        input: &<S as UsesInput>::Input,
         observers: &OT,
         _exit_kind: &ExitKind,
     ) -> Result<bool, Error>
@@ -1145,12 +1152,23 @@ where
         EM: EventFirer<State = S>,
         OT: ObserversTuple<S>,
     {
+        let input_bytes = input.bytes();
+        let grammar = andrew_fuzz::dns::dns();
+        // self.grammar.parse(Bitarray::new(input_bytes));
         // let output = _state.introspection_monitor().
 
         // I think that I can't just keep a reference to the observer in a field of self
         // because then self won't implement Copy, and that makes it harder to serialize to disk.
         // let observer = observers.match_name::<TimeObserver>(self.name()).unwrap();
         // let observer = observers.match_name::<O>(&self.observer_name).unwrap();
+
+        // let asdf: Input = todo!();
+        // let file_path = "./.cur_input.input_observer";
+        // (*input).to_file::<String>(file_path.to_string())?;
+        // let input_data: Vec<u8> = fs::read(file_path.to_string());
+        // now use andrew fuzz to get a featue vector.
+        // then, I use check with equals, or dist, but I think afl max edges alg would actually work the best.
+        // I should try a bunch of different algs here...
         let observer = observers.match_name::<InputObserver>(self.name()).unwrap();
         if let Some(last_input) = observer.last_input() {
             let input_history_state = state

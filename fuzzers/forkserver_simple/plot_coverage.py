@@ -17,6 +17,7 @@ def plot_files(feedback_type, color):
 
 plot_files("AflEdges", "red")
 plot_files("ConstTrue", "blue")
+plot_files("GrammarInput", "orange")
 plt.xlabel("Num Execs")
 plt.ylabel("Coverage")
 # plt.legend()

@@ -5,7 +5,15 @@
 
 pub mod map;
 use alloc::boxed::Box;
+use alloc::rc::Rc;
+use alloc::rc::Weak;
 use alloc::vec::Vec;
+use andrew_fuzz::core::DataModel;
+use andrew_fuzz::core::context::Children;
+use andrew_fuzz::core::context::Context;
+use andrew_fuzz::core::feature_vector::FeatureVector;
+use andrew_fuzz::core::bit_array::BitArray;
+use andrew_fuzz::dns;
 pub use map::*;
 
 pub mod differential;
@@ -1104,13 +1112,14 @@ pub struct InputFeedback {
     // observer: OutputObserver, // todo: should I instead pull the observer out of `_observers` like MapFeedback does???
         // like so: `let observer = observers.match_name::<O>(&self.observer_name).unwrap();`
     name: String,
-    // I could put a grammar here
+    // It is hard to put stuff here because of Serde
     // grammar: Box<dyn DataModel>,
+    // fv_template: FeatureVector,
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct InputFeedbackMetadata {
-    fvs: Vec<Vec<u8>>,
+    fvs: Vec<Vec<f64>>,
 }
 
 crate::impl_serdeany!(
@@ -1123,7 +1132,7 @@ impl InputFeedbackMetadata {
             fvs: Vec::new(),
         }
     }
-    pub fn fvs(&mut self) -> &mut Vec<Vec<u8>> {
+    pub fn fvs(&mut self) -> &mut Vec<Vec<f64>> {
         &mut self.fvs
     }
 }
@@ -1136,6 +1145,10 @@ where
 {
     fn init_state(&mut self, state: &mut S) -> Result<(), Error> {
         state.add_named_metadata(InputFeedbackMetadata::new(), &self.name);
+
+        // self.grammar = dns::dns();
+        // self.fv_template = self.grammar.features();
+
         Ok(())
     }
     #[inline]
@@ -1152,38 +1165,30 @@ where
         EM: EventFirer<State = S>,
         OT: ObserversTuple<S>,
     {
+        let grammar = dns::dns();
+        let fv_template = grammar.features();
         let input_bytes = input.bytes();
-        let grammar = andrew_fuzz::dns::dns();
-        // self.grammar.parse(Bitarray::new(input_bytes));
-        // let output = _state.introspection_monitor().
+        let ctx = Context::new(Weak::new(), Children::Zilch);
+        if let Ok(tree) = grammar.parse(&mut BitArray::new(input_bytes.to_vec(), None), &Rc::new(ctx)) {
+            let mut fv = fv_template.empty();
+            tree.do_vectorization(&mut fv, 0);
 
-        // I think that I can't just keep a reference to the observer in a field of self
-        // because then self won't implement Copy, and that makes it harder to serialize to disk.
-        // let observer = observers.match_name::<TimeObserver>(self.name()).unwrap();
-        // let observer = observers.match_name::<O>(&self.observer_name).unwrap();
-
-        // let asdf: Input = todo!();
-        // let file_path = "./.cur_input.input_observer";
-        // (*input).to_file::<String>(file_path.to_string())?;
-        // let input_data: Vec<u8> = fs::read(file_path.to_string());
-        // now use andrew fuzz to get a featue vector.
-        // then, I use check with equals, or dist, but I think afl max edges alg would actually work the best.
-        // I should try a bunch of different algs here...
-        let observer = observers.match_name::<InputObserver>(self.name()).unwrap();
-        if let Some(last_input) = observer.last_input() {
             let input_history_state = state
                 .named_metadata_mut()
-                .get_mut::<OutputFeedbackMetadata>(&self.name)
+                .get_mut::<InputFeedbackMetadata>(&self.name)
                 .unwrap();
-            let fvs = input_history_state.fvs();
-
-            if fvs.contains(last_input) {
-                return Ok(false)
+            let fv = fv.values();
+            let seen_fvs = input_history_state.fvs();
+            if !seen_fvs.contains(&fv) { // TODO: use HashSet instead?
+                seen_fvs.push(fv);
+                Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
+            } else {
+                Ok(false)
             }
-            fvs.push(last_input.clone()); // todo: use the grammar to compute the fv rather than using the output directly
+        } else {
+            // for now, let's say that a parsing failure isn't very interesting
+            Ok(false)
         }
-
-        Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
     }
 }
 

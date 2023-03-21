@@ -232,6 +232,7 @@ impl Forkserver {
             command.env("__AFL_DEFER_FORKSRV", "1");
         }
 
+        println!("Spawning child now");
         match command
             .env("LD_BIND_NOW", "1")
             .env("ASAN_OPTIONS", get_asan_runtime_flags_with_log_path())
@@ -401,7 +402,7 @@ pub struct TimeoutForkserverExecutor<E> {
 impl<E> TimeoutForkserverExecutor<E> {
     /// Create a new [`TimeoutForkserverExecutor`]
     pub fn new(executor: E, exec_tmout: Duration) -> Result<Self, Error> {
-        let signal = Signal::SIGKILL;
+        let signal = Signal::SIGKILL; // I suspect I need to change this because Knot doesn't seem to be dying properly
         Self::with_signal(executor, exec_tmout, signal, false, None)
     }
 
@@ -492,6 +493,7 @@ where
             .forkserver_mut()
             .set_child_pid(Pid::from_raw(pid));
 
+        println!("timeout is {}", self.timeout);
         if let Some(status) = self
             .executor
             .forkserver_mut()
@@ -503,6 +505,8 @@ where
             }
         } else {
             self.executor.forkserver_mut().set_last_run_timed_out(1);
+
+            println!("child process timed out");
 
             // We need to kill the child in case he has timed out, or we can't get the correct pid in the next call to self.executor.forkserver_mut().read_st()?
             let _ = kill(self.executor.forkserver().child_pid(), self.signal);

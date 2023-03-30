@@ -1197,19 +1197,19 @@ where
 
         let cnt = len / 2;
         let map16 = unsafe { core::slice::from_raw_parts_mut(map.as_mut_ptr() as *mut u16, cnt) };
-        let mut num_non_zero = 0;
-        let mut sum_non_zero: u64 = 0;
+        // let mut num_non_zero = 0;
+        // let mut sum_non_zero: u64 = 0;
         // 2022-07: Adding `enumerate` here increases execution speed/register allocation on x86_64.
         for (_i, item) in map16[0..cnt].iter_mut().enumerate() {
             unsafe {
                 *item = *COUNT_CLASS_LOOKUP_16.get_unchecked(*item as usize);
                 if *item != 0 {
-                    num_non_zero += 1;
-                    sum_non_zero += *item as u64;
+                    // num_non_zero += 1;
+                    // sum_non_zero += *item as u64;
                 }
             }
         }
-        println!("Fuzz coverage: {} total count on {} edges;", sum_non_zero, num_non_zero);
+        // println!("Fuzz coverage: {} total count on {} edges;", sum_non_zero, num_non_zero);
         self.base.post_exec(state, input, exit_kind)
     }
 }

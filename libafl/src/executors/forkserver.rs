@@ -436,7 +436,7 @@ where
         input: &Self::Input,
     ) -> Result<ExitKind, Error> {
         let mut exit_kind = ExitKind::Ok;
-        println!("in TimeoutForkserverExecutor");
+        // println!("in TimeoutForkserverExecutor");
 
         let last_run_timed_out = self.executor.forkserver().last_run_timed_out();
 
@@ -493,7 +493,7 @@ where
             .forkserver_mut()
             .set_child_pid(Pid::from_raw(pid));
 
-        println!("timeout is {}", self.timeout);
+        // println!("timeout is {}", self.timeout);
         if let Some(status) = self
             .executor
             .forkserver_mut()

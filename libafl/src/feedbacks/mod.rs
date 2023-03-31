@@ -1225,7 +1225,7 @@ pub struct OutputFeedback {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct OutputFeedbackMetadata {
-    fvs: Vec<Vec<u8>>,
+    fvs: Vec<Vec<f64>>,
 }
 
 crate::impl_serdeany!(
@@ -1238,7 +1238,7 @@ impl OutputFeedbackMetadata {
             fvs: Vec::new(),
         }
     }
-    pub fn fvs(&mut self) -> &mut Vec<Vec<u8>> {
+    pub fn fvs(&mut self) -> &mut Vec<Vec<f64>> {
         &mut self.fvs
     }
 }
@@ -1274,16 +1274,40 @@ where
         // let observer = observers.match_name::<O>(&self.observer_name).unwrap();
         let observer = observers.match_name::<OutputObserver>(self.name()).unwrap();
         if let Some(last_output) = observer.last_output() {
-            let output_history_state = state
-                .named_metadata_mut()
-                .get_mut::<OutputFeedbackMetadata>(&self.name)
-                .unwrap();
-            let fvs = output_history_state.fvs();
 
-            if fvs.contains(last_output) {
-                return Ok(false)
+            let grammar = dns::dns();
+            let fv_template = grammar.features();
+            let input_bytes = last_output;
+            let ctx = Context::new(Weak::new(), Children::Zilch);
+            if let Ok(tree) = grammar.parse(&mut BitArray::new(input_bytes.to_vec(), None), &Rc::new(ctx)) {
+                let mut fv = fv_template.empty();
+                tree.do_vectorization(&mut fv, 0);
+                let last_output_fv = fv.values();
+
+                let output_history_state = state
+                    .named_metadata_mut()
+                    .get_mut::<OutputFeedbackMetadata>(&self.name)
+                    .unwrap();
+                let fvs = output_history_state.fvs();
+
+                if fvs.contains(&last_output_fv) {
+                    println!("repeat FV");
+                    return Ok(false);
+                }
+                fvs.push(last_output_fv.clone());
+                println!("found novel output: {:?}", &last_output);
+            } else {
+                // for now, let's say that a parsing failure isn't very interesting
+                println!("parsing failure");
+                if !last_output.is_empty() {
+                    println!("found malformed output: {:?}", &last_output);
+                }
+                return Ok(false);
             }
-            fvs.push(last_output.clone()); // todo: use the grammar to compute the fv rather than using the output directly
+        } else {
+            // there was no recorded output
+            println!("no recorded output");
+            return Ok(false);
         }
 
         Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus

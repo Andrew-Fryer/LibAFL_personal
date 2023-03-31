@@ -129,26 +129,40 @@ pub fn main() {
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
-    let grammar_input_feedback = (&"GrammarInput", feedback_or!(
+    // let grammar_input_feedback = (&"GrammarInput", feedback_or!(
+    //     // New maximization map feedback linked to the edges observer and the feedback state
+    //     feedback_and!(
+    //         MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //         ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+    //     ),
+    //     InputFeedback::new_with_observer(&input_observer),
+    //     // Time feedback, this one does not need a feedback state
+    //     TimeFeedback::new_with_observer(&time_observer)
+    // ));
+    let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state
         feedback_and!(
             MaxMapFeedback::new_tracking(&edges_observer, true, false),
-            ConstFeedback::False // this ensures that MaxMapFeedback doens't help us out
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
         ),
-        InputFeedback::new_with_observer(&input_observer),
+        OutputFeedback::new_with_observer(&output_observer), // todo: modify to actually use grammar
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     ));
-    // let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
+    // let grammar_full_feedback = (&"GrammarOutput", feedback_or!(
     //     // New maximization map feedback linked to the edges observer and the feedback state
-    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //     feedback_and!(
+    //         MaxMapFeedback::new_tracking(&edges_observer, true, false),
+    //         ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+    //     ),
+    //     InputFeedback::new_with_observer(&input_observer),
     //     OutputFeedback::new_with_observer(&output_observer), // todo: modify to actually use grammar
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
 
     // Change the following line to run different feecbacks
-    let (feedback_name, mut feedback) = grammar_input_feedback;
+    let (feedback_name, mut feedback) = grammar_output_feedback;
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does
@@ -209,7 +223,7 @@ pub fn main() {
         .is_persistent(true)
         .pipe_input(true)
         // .build(tuple_list!(time_observer, edges_observer))
-        .build(tuple_list!(time_observer, edges_observer, input_observer))
+        .build(tuple_list!(time_observer, edges_observer, input_observer, output_observer))
         // .build(tuple_list!(time_observer, edges_observer, output_observer))
         .unwrap();
 

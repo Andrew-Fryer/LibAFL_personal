@@ -576,10 +576,12 @@ where
         //     .named_metadata_mut()
         //     .get_mut::<MapFeedbackMetadata<u8>>(&self.name)
         //     .unwrap();
-        let output_data = fs::read("output")?; // todo: rename to .cur_output?
+        let output_path = "./.cur_output";
+        let output_data = fs::read(&output_path).ok();
+        // let _ = fs::remove_file(&output_path);
         // let mut fv = Vec::new();
         // self.last_output = Some(fv);
-        self.last_output = Some(output_data);
+        self.last_output = output_data;
         Ok(())
     }
 }

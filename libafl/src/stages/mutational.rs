@@ -111,7 +111,7 @@ where
 
     /// Gets the number of iterations as a random number
     fn iterations(&self, state: &mut Z::State, _corpus_idx: usize) -> Result<u64, Error> {
-        Ok(1 + state.rand_mut().below(DEFAULT_MUTATIONAL_MAX_ITERATIONS))
+        Ok(1 + state.rand_mut().below(DEFAULT_MUTATIONAL_MAX_ITERATIONS)) // we don't get the right number of iter because on each iter we get this non-deterministic number of execs (Also, we only report the number of execs occasionally; I think only when we see something interesting -> I should change this to print the number of execs every _ number of execs and maybe I should hardcode the number of execs per iter here to make it make more sense...)
     }
 }
 

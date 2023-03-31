@@ -217,8 +217,9 @@ where
         let mut last = current_time();
         let monitor_timeout = STATS_TIMEOUT_DEFAULT;
 
-        for _ in 0..iters {
+        for i in 0..iters {
             ret = self.fuzz_one(stages, executor, state, manager)?;
+            println!("Just ran iter {}", i);
             last = manager.maybe_report_progress(state, last, monitor_timeout)?;
         }
 

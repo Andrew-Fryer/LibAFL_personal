@@ -1298,7 +1298,7 @@ where
                 println!("found novel output: {:?}", &last_output);
             } else {
                 // for now, let's say that a parsing failure isn't very interesting
-                println!("parsing failure");
+                // println!("parsing failure");
                 if !last_output.is_empty() {
                     println!("found malformed output: {:?}", &last_output);
                 }

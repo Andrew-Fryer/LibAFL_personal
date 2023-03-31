@@ -139,30 +139,30 @@ pub fn main() {
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
-    let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
-        // New maximization map feedback linked to the edges observer and the feedback state
-        feedback_and!(
-            MaxMapFeedback::new_tracking(&edges_observer, true, false),
-            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
-        ),
-        OutputFeedback::new_with_observer(&output_observer), // todo: modify to actually use grammar
-        // Time feedback, this one does not need a feedback state
-        TimeFeedback::new_with_observer(&time_observer)
-    ));
-    // let grammar_full_feedback = (&"GrammarOutput", feedback_or!(
+    // let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
     //     // New maximization map feedback linked to the edges observer and the feedback state
     //     feedback_and!(
     //         MaxMapFeedback::new_tracking(&edges_observer, true, false),
     //         ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
     //     ),
-    //     InputFeedback::new_with_observer(&input_observer),
-    //     OutputFeedback::new_with_observer(&output_observer), // todo: modify to actually use grammar
+    //     OutputFeedback::new_with_observer(&output_observer),
     //     // Time feedback, this one does not need a feedback state
     //     TimeFeedback::new_with_observer(&time_observer)
     // ));
+    let grammar_full_feedback = (&"GrammarFull", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        feedback_and!(
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
+        InputFeedback::new_with_observer(&input_observer),
+        OutputFeedback::new_with_observer(&output_observer),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
 
     // Change the following line to run different feecbacks
-    let (feedback_name, mut feedback) = grammar_output_feedback;
+    let (feedback_name, mut feedback) = grammar_full_feedback;
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does
@@ -212,7 +212,7 @@ pub fn main() {
     // Create the executor for the forkserver
     let args = opt.arguments;
 
-    let mut tokens = Tokens::new();
+    let mut tokens = Tokens::new(); // TODO: try removing this! (andrew)
     let mut forkserver = ForkserverExecutor::builder()
         .program(opt.executable)
         .debug_child(debug_child)
@@ -265,7 +265,7 @@ pub fn main() {
         StdScheduledMutator::with_max_stack_pow(havoc_mutations().merge(tokens_mutations()), 6);
     let mut stages = tuple_list!(StdMutationalStage::new(mutator));
 
-    let iters = 100000;
+    let iters = 100000; // TODO: why isn't it stopping at 100000 execs?
     fuzzer
         .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, iters)
         // .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)

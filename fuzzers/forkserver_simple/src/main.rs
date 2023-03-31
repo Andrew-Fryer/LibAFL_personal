@@ -192,7 +192,7 @@ pub fn main() {
 
     // The Monitor trait define how the fuzzer stats are reported to the user
     let timestamp = OffsetDateTime::now_utc();
-    let coverage_file = format!("./coverage_{:?}_{}.csv", feedback_name, timestamp);
+    let coverage_file = format!("./coverage_logs/coverage_{:?}_{}.csv", feedback_name, timestamp);
     let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop

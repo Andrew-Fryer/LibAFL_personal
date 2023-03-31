@@ -8,7 +8,7 @@ import glob
 
 columns = ["num_execs", "coverage", "map_size"]
 def plot_files(feedback_type, color):
-    path = 'coverage_"{}"_*.csv'.format(feedback_type)
+    path = './coverage_logs/coverage_"{}"_*.csv'.format(feedback_type)
     files = glob.glob(path)
     for f in files:
         df = pd.read_csv(f, names=columns)

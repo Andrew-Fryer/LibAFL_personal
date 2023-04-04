@@ -49,7 +49,7 @@ where
         manager: &mut EM,
         corpus_idx: usize,
     ) -> Result<(), Error> {
-        let num = self.iterations(state, corpus_idx)?;
+        let num = 50; //self.iterations(state, corpus_idx)?;
 
         for i in 0..num {
             start_timer!(state);

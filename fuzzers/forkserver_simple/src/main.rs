@@ -267,7 +267,7 @@ pub fn main() {
         StdScheduledMutator::with_max_stack_pow(havoc_mutations().merge(tokens_mutations()), 6);
     let mut stages = tuple_list!(StdMutationalStage::new(mutator));
 
-    let iters = 2; // TODO: why isn't it stopping at 100000 execs?
+    let iters = 20000; // TODO: why isn't it stopping at 100000 execs?
     fuzzer
         .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, iters)
         // .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)

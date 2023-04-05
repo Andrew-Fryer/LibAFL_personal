@@ -50,6 +50,11 @@ stats = {}
 hist_vals = []
 colors = []
 labels = []
+fig, axs = plt.subplots(len(feedback_types))
+i = 0
+x_start = 800
+x_end = 1300
+bins = np.linspace(x_start, x_end, 50)
 for feedback_type, c in feedback_types:
     vals = coverage_at_end[feedback_type]
     if len(vals) > 0:
@@ -60,19 +65,22 @@ for feedback_type, c in feedback_types:
             "stdev": s,
             "min_dev": m - 2 * s,
             "max_dev": m + 2 * s,
+            "num_vals": len(vals),
         }
         # print(feedback_type, mean(vals), stdev(vals))
-    hist_val, bins = np.histogram(vals, 10)
+    hist_val, _bins = np.histogram(vals, bins)
     hist_vals.append(vals)
     # hist_vals.append(hist_val)
     colors.append(c)
     labels.append(feedback_type)
 
-    h, edges = np.histogram(vals, bins=np.linspace(800, 1300, 50))
+    h, edges = np.histogram(vals, bins=bins)
 
-    plt.stairs(h, edges, color=c, label=feedback_type)
-# plt.set_title("Step Histograms")
-plt.legend()
+    axs[i].stairs(h, bins, color=c, label=feedback_type)
+    axs[i].set_xlim(x_start, x_end)
+    axs[i].set_ylim(0, 6)
+    axs[i].legend()
+    i += 1
 plt.savefig("coverage_hist.png")
 
 # print(stats)

@@ -123,6 +123,7 @@ pub fn main() {
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     ));
+    // TODO: I should probably change this to probabilistically pick inputs because this logs every exec and keeps all inputs in the corpus in memory (I think), which is probably pretty bad for performance...
     #[cfg(feedback_alg = "ConstTrue")]
     let (feedback_name, mut feedback) = (&"ConstTrue", feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state

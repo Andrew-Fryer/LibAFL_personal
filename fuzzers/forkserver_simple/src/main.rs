@@ -116,40 +116,45 @@ pub fn main() {
 
     // Feedback to rate the interestingness of an input
     // This one is composed by two Feedbacks in OR
-    // let afl_edges_feedback = (&"AflEdges", feedback_or!(
-    //     // New maximization map feedback linked to the edges observer and the feedback state
-    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
-    //     // Time feedback, this one does not need a feedback state
-    //     TimeFeedback::new_with_observer(&time_observer)
-    // ));
-    // let const_feedback = (&"ConstTrue", feedback_or!(
-    //     // New maximization map feedback linked to the edges observer and the feedback state
-    //     MaxMapFeedback::new_tracking(&edges_observer, true, false),
-    //     ConstFeedback::True,
-    //     // Time feedback, this one does not need a feedback state
-    //     TimeFeedback::new_with_observer(&time_observer)
-    // ));
-    // let grammar_input_feedback = (&"GrammarInput", feedback_or!(
-    //     // New maximization map feedback linked to the edges observer and the feedback state
-    //     feedback_and!(
-    //         MaxMapFeedback::new_tracking(&edges_observer, true, false),
-    //         ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
-    //     ),
-    //     InputFeedback::new_with_observer(&input_observer),
-    //     // Time feedback, this one does not need a feedback state
-    //     TimeFeedback::new_with_observer(&time_observer)
-    // ));
-    // let grammar_output_feedback = (&"GrammarOutput", feedback_or!(
-    //     // New maximization map feedback linked to the edges observer and the feedback state
-    //     feedback_and!(
-    //         MaxMapFeedback::new_tracking(&edges_observer, true, false),
-    //         ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
-    //     ),
-    //     OutputFeedback::new_with_observer(&output_observer),
-    //     // Time feedback, this one does not need a feedback state
-    //     TimeFeedback::new_with_observer(&time_observer)
-    // ));
-    let grammar_full_feedback = (&"GrammarFull", feedback_or!(
+    #[cfg(feedback_alg = "AflEdges")]
+    let (feedback_name, mut feedback) = (&"AflEdges", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
+    #[cfg(feedback_alg = "ConstTrue")]
+    let (feedback_name, mut feedback) = (&"ConstTrue", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        MaxMapFeedback::new_tracking(&edges_observer, true, false),
+        ConstFeedback::True,
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
+    #[cfg(feedback_alg = "GrammarInput")]
+    let (feedback_name, mut feedback) = (&"GrammarInput", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        feedback_and!(
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
+        InputFeedback::new_with_observer(&input_observer),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
+    #[cfg(feedback_alg = "GrammarOutput")]
+    let (feedback_name, mut feedback) = (&"GrammarOutput", feedback_or!(
+        // New maximization map feedback linked to the edges observer and the feedback state
+        feedback_and!(
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
+        OutputFeedback::new_with_observer(&output_observer),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
+    #[cfg(feedback_alg = "GrammarFull")]
+    let (feedback_name, mut feedback) = (&"GrammarFull", feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state
         feedback_and!(
             MaxMapFeedback::new_tracking(&edges_observer, true, false),
@@ -160,9 +165,6 @@ pub fn main() {
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     ));
-
-    // Change the following line to run different feecbacks
-    let (feedback_name, mut feedback) = grammar_full_feedback;
 
     // A feedback to choose if an input is a solution or not
     // We want to do the same crash deduplication that AFL does

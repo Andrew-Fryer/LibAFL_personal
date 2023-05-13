@@ -1,5 +1,5 @@
 use core::time::Duration;
-use std::{path::PathBuf, str::FromStr};
+use std::{path::PathBuf, str::FromStr, fs};
 use time::OffsetDateTime;
 
 use clap::{self, Parser};
@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver}, feedback_and,
+    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -273,4 +273,13 @@ pub fn main() {
         .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, iters)
         // .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)
         .expect("Error in the fuzzing loop");
+
+        // write out history edge coverage bit map to disk
+        let map_state = state
+            .named_metadata_mut()
+            .get_mut::<MapFeedbackMetadata<u8>>("mapfeedback_metadata_shared_mem")
+            .unwrap();
+        let history_map = map_state.history_map.as_slice();
+        fs::write("edge_final_coverage", history_map);
+
 }

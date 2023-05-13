@@ -386,6 +386,8 @@ where
                     let (res, _) = fuzzer.evaluate_input(self, executor, manager, input)?;
                     if res == ExecuteInputResult::None {
                         println!("File {:?} was not interesting, skipped.", &path);
+                    } else {
+                        println!("File {:?} is interesting!", &path);
                     }
                 }
             } else if attr.is_dir() {

@@ -41,18 +41,18 @@ def plot_files(feedback_type, color):
         for f in files:
             df = pd.read_csv(f, names=columns)
             # plt.plot(df.num_execs, df.coverage, label=feedback_type)
-            plt.plot(df.num_execs, df.coverage, color=color, linewidth=0.2)
+            # plt.plot(df.num_execs, df.coverage, color=color, linewidth=0.2)
             # plt.scatter(df.num_execs, df.coverage, color=color)
             final_coverage_value = df.coverage.iloc[-1]
             coverage_at_end[feedback_type].append(final_coverage_value)
 
 for ft, c in feedback_types:
     plot_files(ft, c)
-plt.xlabel("Num Execs")
-plt.ylabel("Coverage")
+# plt.xlabel("Num Execs")
+# plt.ylabel("Coverage")
 # plt.legend()
-plt.savefig("coverage_plot.png")
-plt.clf()
+# plt.savefig("coverage_plot.png")
+# plt.clf()
 
 stats = {}
 colors = []
@@ -78,7 +78,7 @@ for feedback_type, c in feedback_types:
     axs[i].stairs(h, bins, color=c, label=feedback_type)
     axs[i].set_xlim(x_start, x_end)
     axs[i].get_xaxis().set_visible(False)
-    axs[i].set_ylim(0, 30)
+    axs[i].set_ylim(0, 40)
     axs[i].legend()
     i += 1
 axs[i - 1].get_xaxis().set_visible(True)

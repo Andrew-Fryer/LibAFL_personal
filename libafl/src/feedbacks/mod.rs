@@ -4,11 +4,14 @@
 //! TODO: make S of Feedback<S> an associated type when specialisation + AT is stable
 
 pub mod map;
+use alloc::boxed::Box;
 use alloc::rc::Rc;
 use alloc::rc::Weak;
 use alloc::vec::Vec;
+use andrew_fuzz::core::DataModel;
 use andrew_fuzz::core::context::Children;
 use andrew_fuzz::core::context::Context;
+use andrew_fuzz::core::feature_vector::FeatureVector;
 use andrew_fuzz::core::bit_array::BitArray;
 use andrew_fuzz::dns;
 pub use map::*;
@@ -35,15 +38,18 @@ use core::{
     marker::PhantomData,
     time::Duration,
 };
+use std::fs;
 
 #[cfg(feature = "nautilus")]
 pub use nautilus::*;
 use serde::{Deserialize, Serialize};
 
+use crate::inputs::BytesInput;
 use crate::inputs::HasBytesVec;
 use crate::observers::InputObserver;
 use crate::observers::OutputObserver;
 use crate::prelude::HasNamedMetadata;
+use crate::prelude::Input;
 use crate::{
     bolts::tuples::Named,
     corpus::Testcase,

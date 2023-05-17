@@ -4,14 +4,11 @@
 //! TODO: make S of Feedback<S> an associated type when specialisation + AT is stable
 
 pub mod map;
-use alloc::boxed::Box;
 use alloc::rc::Rc;
 use alloc::rc::Weak;
 use alloc::vec::Vec;
-use andrew_fuzz::core::DataModel;
 use andrew_fuzz::core::context::Children;
 use andrew_fuzz::core::context::Context;
-use andrew_fuzz::core::feature_vector::FeatureVector;
 use andrew_fuzz::core::bit_array::BitArray;
 use andrew_fuzz::dns;
 pub use map::*;
@@ -38,18 +35,15 @@ use core::{
     marker::PhantomData,
     time::Duration,
 };
-use std::fs;
 
 #[cfg(feature = "nautilus")]
 pub use nautilus::*;
 use serde::{Deserialize, Serialize};
 
-use crate::inputs::BytesInput;
 use crate::inputs::HasBytesVec;
 use crate::observers::InputObserver;
 use crate::observers::OutputObserver;
 use crate::prelude::HasNamedMetadata;
-use crate::prelude::Input;
 use crate::{
     bolts::tuples::Named,
     corpus::Testcase,
@@ -1119,7 +1113,8 @@ pub struct InputFeedback {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct InputFeedbackMetadata {
-    fvs: Vec<Vec<f64>>,
+    history: Option<Vec<u8>>,
+    fvs: Vec<Vec<u8>>,
 }
 
 crate::impl_serdeany!(
@@ -1129,12 +1124,19 @@ crate::impl_serdeany!(
 impl InputFeedbackMetadata {
     pub fn new() -> Self {
         Self {
+            history: None,
             fvs: Vec::new(),
         }
     }
-    pub fn fvs(&mut self) -> &mut Vec<Vec<f64>> {
+    pub fn fvs(&mut self) -> &mut Vec<Vec<u8>> {
         &mut self.fvs
     }
+    pub fn history(&mut self) -> &mut Option<Vec<u8>> {
+        &mut self.history
+    }
+    // pub fn set_history(&mut self, history: Option<Vec<f64>>) {
+    //     self.history = history;
+    // }
 }
 
 impl<S> Feedback<S> for InputFeedback
@@ -1177,14 +1179,28 @@ where
                 .named_metadata_mut()
                 .get_mut::<InputFeedbackMetadata>(&self.name)
                 .unwrap();
-            let fv = fv.values();
-            let seen_fvs = input_history_state.fvs();
-            if !seen_fvs.contains(&fv) { // TODO: use HashSet instead?
-                seen_fvs.push(fv);
-                Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
+            let fv = fv.bucket_values();
+            let mut is_interesting = false;
+            let history = input_history_state.history();
+            if let Some(history_vec) = history {
+                for i in 0..history_vec.len() {
+                    if fv[i] > history_vec[i] {
+                        history_vec[i] = fv[i];
+                        is_interesting = true;
+                    }
+                }
             } else {
-                Ok(false)
+                *history = Some(fv);
+                is_interesting = true;
             }
+            Ok(is_interesting)
+            // let seen_fvs = input_history_state.fvs();
+            // if !seen_fvs.contains(&fv) { // TODO: use HashSet instead?
+            //     seen_fvs.push(fv);
+            //     Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
+            // } else {
+            //     Ok(false)
+            // }
         } else {
             // for now, let's say that a parsing failure isn't very interesting
             Ok(false)

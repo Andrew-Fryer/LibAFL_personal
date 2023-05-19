@@ -1,0 +1,603 @@
+Spawning child now
+All right - fork server is up.
+Target MAP SIZE = 0x10000
+ForkserverExecutor: program: "./knotd_stdio", arguments: [], use_stdin: true
+Loading file "./corpus/bind-systemtest-7726aff5f05f.pkt" ...
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 0, objectives: 0, executions: 0, exec/sec: 0, map coverage: 341 / 65536
+found novel output: [49, 50, 129, 5, 0, 1, 0, 0, 0, 0, 0, 1, 3, 116, 120, 116, 7, 101, 120, 97, 109, 112, 108, 101, 0, 0, 16, 0, 1, 0, 0, 41, 4, 208, 0, 0, 0, 0, 0, 6, 0, 15, 0, 2, 0, 20]
+[Testcase #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 341 / 65536
+File "./corpus/bind-systemtest-7726aff5f05f.pkt" is interesting!
+[LOG Debug]: Loaded 1 initial testcases.
+We imported 1 inputs from disk.
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 353 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 363 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 364 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 368 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 369 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 370 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 375 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 377 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 377 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 386 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 388 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 389 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 391 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 393 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 398 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 399 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 401 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 402 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 403 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 405 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 405 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 405 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 414 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 416 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 416 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 417 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 421 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 423 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 424 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 425 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 425 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 426 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 427 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 431 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 432 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 433 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 433 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 438 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 439 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 440 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 440 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 440 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 441 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 441 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 442 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 444 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 444 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 446 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 446 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 447 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 450 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 451 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 451 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 452 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 453 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 454 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 454 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 454 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 456 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 457 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 457 / 65536
+[Stats #0] run time: 0h-0m-0s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 457 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 457 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 459 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 462 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 463 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 463 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 463 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 463 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 463 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 464 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 464 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 464 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 465 / 65536
+[Stats #0] run time: 0h-0m-1s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 465 / 65536
+[Stats #0] run time: 0h-0m-2s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 465 / 65536
+[Stats #0] run time: 0h-0m-2s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 466 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-2s, clients: 1, corpus: 1, objectives: 0, executions: 1, exec/sec: 0, map coverage: 467 / 65536
+found novel output: [49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 116, 120, 116, 7, 101, 120, 97, 109, 112, 108, 101, 0, 0, 16, 0, 1]
+[Testcase #0] run time: 0h-0m-2s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 4552, map coverage: 467 / 65536
+[Stats #0] run time: 0h-0m-2s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 3573, map coverage: 467 / 65536
+[Stats #0] run time: 0h-0m-3s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 3221, map coverage: 471 / 65536
+[Stats #0] run time: 0h-0m-3s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 3178, map coverage: 471 / 65536
+[Stats #0] run time: 0h-0m-4s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 2478, map coverage: 471 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-4s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 2372, map coverage: 473 / 65536
+[Stats #0] run time: 0h-0m-5s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1971, map coverage: 473 / 65536
+[Stats #0] run time: 0h-0m-5s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1965, map coverage: 473 / 65536
+[Stats #0] run time: 0h-0m-5s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1956, map coverage: 474 / 65536
+[Stats #0] run time: 0h-0m-5s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1780, map coverage: 474 / 65536
+[Stats #0] run time: 0h-0m-5s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1723, map coverage: 480 / 65536
+[Stats #0] run time: 0h-0m-6s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1630, map coverage: 482 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-7s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1286, map coverage: 482 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-8s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1189, map coverage: 482 / 65536
+[Stats #0] run time: 0h-0m-8s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1134, map coverage: 482 / 65536
+[Stats #0] run time: 0h-0m-8s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1124, map coverage: 482 / 65536
+[Stats #0] run time: 0h-0m-9s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 1074, map coverage: 482 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+[Stats #0] run time: 0h-0m-10s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 959, map coverage: 482 / 65536
+[Stats #0] run time: 0h-0m-10s, clients: 1, corpus: 2, objectives: 0, executions: 10001, exec/sec: 942, map coverage: 483 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+found novel output: [49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 1, 0]
+[Testcase #0] run time: 0h-0m-13s, clients: 1, corpus: 3, objectives: 0, executions: 70001, exec/sec: 5025, map coverage: 483 / 65536
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 1, 0]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 1, 0]
+[Stats #0] run time: 0h-0m-14s, clients: 1, corpus: 3, objectives: 0, executions: 70001, exec/sec: 5005, map coverage: 483 / 65536
+[Stats #0] run time: 0h-0m-15s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 5025, map coverage: 483 / 65536
+[Stats #0] run time: 0h-0m-15s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 4840, map coverage: 483 / 65536
+[Stats #0] run time: 0h-0m-15s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 4774, map coverage: 484 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-15s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 4756, map coverage: 506 / 65536
+repeat FV
+[Stats #0] run time: 0h-0m-17s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 4424, map coverage: 506 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-18s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 4043, map coverage: 506 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-20s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 3740, map coverage: 506 / 65536
+[Stats #0] run time: 0h-0m-20s, clients: 1, corpus: 3, objectives: 0, executions: 75401, exec/sec: 3608, map coverage: 506 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 1, 0]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 1, 0]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-30s, clients: 1, corpus: 3, objectives: 0, executions: 151601, exec/sec: 5052, map coverage: 506 / 65536
+[Stats #0] run time: 0h-0m-30s, clients: 1, corpus: 3, objectives: 0, executions: 151601, exec/sec: 4913, map coverage: 508 / 65536
+[Stats #0] run time: 0h-0m-31s, clients: 1, corpus: 3, objectives: 0, executions: 151601, exec/sec: 4885, map coverage: 509 / 65536
+[Stats #0] run time: 0h-0m-31s, clients: 1, corpus: 3, objectives: 0, executions: 151601, exec/sec: 4830, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-32s, clients: 1, corpus: 3, objectives: 0, executions: 151601, exec/sec: 4723, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+found novel output: [49, 205, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 41, 61, 0]
+[Testcase #0] run time: 0h-0m-33s, clients: 1, corpus: 4, objectives: 0, executions: 170001, exec/sec: 5084, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-35s, clients: 1, corpus: 4, objectives: 0, executions: 170001, exec/sec: 4764, map coverage: 509 / 65536
+[Stats #0] run time: 0h-0m-36s, clients: 1, corpus: 4, objectives: 0, executions: 170001, exec/sec: 4703, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 205, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 122, 122, 122]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-0m-45s, clients: 1, corpus: 4, objectives: 0, executions: 229951, exec/sec: 5108, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+found novel output: [49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 1, 0, 0, 0, 16, 0, 1]
+[Testcase #0] run time: 0h-0m-57s, clients: 1, corpus: 5, objectives: 0, executions: 290001, exec/sec: 5077, map coverage: 509 / 65536
+[Stats #0] run time: 0h-0m-57s, clients: 1, corpus: 5, objectives: 0, executions: 290001, exec/sec: 5047, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+[Stats #0] run time: 0h-1m-0s, clients: 1, corpus: 5, objectives: 0, executions: 304601, exec/sec: 5075, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 207, 184, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-1m-15s, clients: 1, corpus: 5, objectives: 0, executions: 379751, exec/sec: 5061, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-1m-30s, clients: 1, corpus: 5, objectives: 0, executions: 454351, exec/sec: 5046, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 205, 153, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 41, 51, 0]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-1m-43s, clients: 1, corpus: 5, objectives: 0, executions: 454351, exec/sec: 4374, map coverage: 509 / 65536
+[Stats #0] run time: 0h-1m-45s, clients: 1, corpus: 5, objectives: 0, executions: 529501, exec/sec: 5041, map coverage: 509 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-1m-49s, clients: 1, corpus: 5, objectives: 0, executions: 529501, exec/sec: 4857, map coverage: 515 / 65536
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-0s, clients: 1, corpus: 5, objectives: 0, executions: 604501, exec/sec: 5036, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+found novel output: [49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 32, 0, 1, 0, 64, 0, 0, 0, 1, 0, 0, 41, 61, 0, 3, 98, 97, 102, 7, 101, 120, 0, 0, 3, 108, 101, 101, 0, 0, 41, 100, 228, 190, 0, 0, 239, 255, 2]
+[Testcase #0] run time: 0h-2m-3s, clients: 1, corpus: 6, objectives: 0, executions: 620001, exec/sec: 5036, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-15s, clients: 1, corpus: 6, objectives: 0, executions: 678701, exec/sec: 5026, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-17s, clients: 1, corpus: 6, objectives: 0, executions: 678701, exec/sec: 4922, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-19s, clients: 1, corpus: 6, objectives: 0, executions: 678701, exec/sec: 4851, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 58, 8, 104]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 58, 8, 104]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 58, 8, 104]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 58, 8, 104]
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 58, 8, 104]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-30s, clients: 1, corpus: 6, objectives: 0, executions: 752601, exec/sec: 5015, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-38s, clients: 1, corpus: 6, objectives: 0, executions: 752601, exec/sec: 4755, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+found novel output: [49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 0, 2]
+[Testcase #0] run time: 0h-2m-39s, clients: 1, corpus: 7, objectives: 0, executions: 800001, exec/sec: 5013, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-2m-45s, clients: 1, corpus: 7, objectives: 0, executions: 827151, exec/sec: 5011, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-3m-0s, clients: 1, corpus: 7, objectives: 0, executions: 901801, exec/sec: 5008, map coverage: 515 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 108, 101, 0, 0, 16, 0, 0, 0]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-3m-7s, clients: 1, corpus: 7, objectives: 0, executions: 901801, exec/sec: 4798, map coverage: 516 / 65536
+[Stats #0] run time: 0h-3m-8s, clients: 1, corpus: 7, objectives: 0, executions: 901801, exec/sec: 4778, map coverage: 516 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+[Stats #0] run time: 0h-3m-15s, clients: 1, corpus: 7, objectives: 0, executions: 974901, exec/sec: 4998, map coverage: 516 / 65536
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV
+found malformed output: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 50, 129, 1, 0, 1, 0, 0, 0, 0, 0, 0, 3, 109, 101, 0, 0, 16, 0, 1, 0]
+Setting output_file ./.cur_output to fd 3
+main thread waiting for a bit
+andrew: writing non-empty output data
+andrew: writing non-empty output data
+main thread waiting for a bit
+main thread waiting for a bit
+repeat FV

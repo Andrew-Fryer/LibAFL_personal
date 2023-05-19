@@ -1214,7 +1214,7 @@ where
             }
 
             // change this flag to tweak the alg
-            let unique_is_interesting = true;
+            let unique_is_interesting = false;
             if unique_is_interesting {
                 let seen_fvs = input_history_state.fvs();
                 if !seen_fvs.contains(&fv_values) { // TODO: use HashSet instead?

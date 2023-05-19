@@ -209,7 +209,9 @@ pub fn main() {
 
     // The Monitor trait define how the fuzzer stats are reported to the user
     let timestamp = OffsetDateTime::now_utc();
-    let coverage_file = format!("./coverage_logs/coverage_{:?}_{}.csv", feedback_name, timestamp);
+    let run_dir_path = format!("./{}/{}", feedback_name, timestamp);
+    fs::create_dir(&run_dir_path).unwrap();
+    let coverage_file = format!("{}/coverage.csv", &run_dir_path);
     let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop
@@ -282,39 +284,39 @@ pub fn main() {
         StdScheduledMutator::with_max_stack_pow(havoc_mutations().merge(tokens_mutations()), 6);
     let mut stages = tuple_list!(StdMutationalStage::new(mutator));
 
-    let iters = 20000; // TODO: why isn't it stopping at 100000 execs?
+    let iters = 2; // TODO: why isn't it stopping at 100000 execs?
     fuzzer
         .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, iters)
         // .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)
         .expect("Error in the fuzzing loop");
 
-        // write out history edge coverage bit map to disk
-        let map_state = state
-            .named_metadata_mut()
-            .get_mut::<MapFeedbackMetadata<u8>>("mapfeedback_metadata_shared_mem")
-            .unwrap();
-        let history_map = map_state.history_map.as_slice();
-        fs::write("edge_final_coverage", history_map);
+    // write out history edge coverage bit map to disk
+    let map_state = state
+        .named_metadata_mut()
+        .get_mut::<MapFeedbackMetadata<u8>>("mapfeedback_metadata_shared_mem")
+        .unwrap();
+    let history_map = map_state.history_map.as_slice();
+    fs::write(format!("{}/edge_final_coverage", &run_dir_path), history_map);
 
-        // write out history input grammar edge coverage to disk
-        let input_history_state = state
-            .named_metadata_mut()
-            .get_mut::<InputFeedbackMetadata>(&"GrammarInput")
-            .unwrap();
-        let history_input_fvs = input_history_state.history().as_ref().unwrap();
-        fs::write("input_grammar_coverage", u64s_to_string(history_input_fvs));
+    // write out history input grammar edge coverage to disk
+    let input_history_state = state
+        .named_metadata_mut()
+        .get_mut::<InputFeedbackMetadata>(&"input")
+        .unwrap();
+    let history_input_fvs = input_history_state.history().as_ref().unwrap();
+    fs::write(format!("{}/input_grammar_coverage", &run_dir_path), u64s_to_string(history_input_fvs));
 
-        // write out history output grammar edge coverage to disk
-        let output_history_state = state
-            .named_metadata_mut()
-            .get_mut::<OutputFeedbackMetadata>(&"GrammarOutput")
-            .unwrap();
-        let history_output_fvs = output_history_state.history().as_ref().unwrap();
-        fs::write("output_grammar_coverage", u64s_to_string(history_output_fvs));
+    // write out history output grammar edge coverage to disk
+    let output_history_state = state
+        .named_metadata_mut()
+        .get_mut::<OutputFeedbackMetadata>(&"output")
+        .unwrap();
+    let history_output_fvs = output_history_state.history().as_ref().unwrap();
+    fs::write(format!("{}/output_grammar_coverage", &run_dir_path), u64s_to_string(history_output_fvs));
 
-        let num_elements_in_corpus = state.corpus().count();
-        let num_elements_in_corpus_message = format!("num_elements_in_corpus: {}", num_elements_in_corpus);
-        fs::write("num_elements_in_corpus", num_elements_in_corpus_message);
+    let num_elements_in_corpus = state.corpus().count();
+    let num_elements_in_corpus_message = format!("num_elements_in_corpus: {}", num_elements_in_corpus);
+    fs::write(format!("{}/num_elements_in_corpus", &run_dir_path), num_elements_in_corpus_message);
 }
 
 fn u64s_to_string(input: &[u64]) -> String {

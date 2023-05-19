@@ -11,6 +11,8 @@ use andrew_fuzz::core::context::Children;
 use andrew_fuzz::core::context::Context;
 use andrew_fuzz::core::bit_array::BitArray;
 use andrew_fuzz::dns;
+use rand::Rng;
+use rand::rngs::ThreadRng;
 pub use map::*;
 
 pub mod differential;
@@ -1097,6 +1099,53 @@ impl From<bool> for ConstFeedback {
         } else {
             Self::False
         }
+    }
+}
+
+/// The [`RandomFeedback`] is random
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RandomFeedback {
+    probability: f64,
+}
+
+impl RandomFeedback {
+    pub fn new(probability: f64) -> Self {
+        Self {
+            probability,
+        }
+    }
+}
+
+impl<S> Feedback<S> for RandomFeedback
+where
+    S: UsesInput + HasClientPerfMonitor,
+{
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn is_interesting<EM, OT>(
+        &mut self,
+        _state: &mut S,
+        _manager: &mut EM,
+        _input: &S::Input,
+        _observers: &OT,
+        _exit_kind: &ExitKind,
+    ) -> Result<bool, Error>
+    where
+        EM: EventFirer<State = S>,
+        OT: ObserversTuple<S>,
+    {
+        let precision = 1000000;
+        let mut rng = rand::thread_rng(); // I (Andrew) do this here because it isn't serializable
+        let rand_val = rng.gen_range(0..precision);
+        let result = (rand_val as f64) < self.probability * precision as f64;
+        Ok(result)
+    }
+}
+
+impl Named for RandomFeedback {
+    #[inline]
+    fn name(&self) -> &str {
+        "RandomFeedback"
     }
 }
 

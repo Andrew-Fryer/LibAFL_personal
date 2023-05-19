@@ -101,6 +101,8 @@ grammartec = { version = "0.2", optional = true }
 
 andrew_fuzz = { path = "../../andrewFuzz_rust/andrew_fuzz/" }
 
+rand = "0.8.4"
+
 [target.'cfg(unix)'.dependencies]
 libc = "0.2" # For (*nix) libc
 uds = { version = "0.2.6", optional = true }

@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata}, feedback_and,
+    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, RandomFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -146,7 +146,20 @@ pub fn main() {
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     ));
-    // TODO: I should probably change this to probabilistically pick inputs because this logs every exec and keeps all inputs in the corpus in memory (I think), which is probably pretty bad for performance...
+    #[cfg(feedback_alg = "Random")]
+    let (feedback_name, mut feedback) = (&"Random", feedback_or!(
+        feedback_and!(
+            // New maximization map feedback linked to the edges observer and the feedback state
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            // these are here so that we compute grammar coverage
+            InputFeedback::new_with_observer(&input_observer),
+            OutputFeedback::new_with_observer(&output_observer),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
+        RandomFeedback::new(200.0 / 1000000.0),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
     #[cfg(feedback_alg = "ConstTrue")]
     let (feedback_name, mut feedback) = (&"ConstTrue", feedback_or!(
         feedback_and!(

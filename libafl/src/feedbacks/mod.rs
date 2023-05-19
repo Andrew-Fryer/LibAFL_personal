@@ -1179,28 +1179,52 @@ where
                 .named_metadata_mut()
                 .get_mut::<InputFeedbackMetadata>(&self.name)
                 .unwrap();
-            let fv = fv.bucket_values();
+            let fv_values = fv.values_u64();
+
             let mut is_interesting = false;
             let history = input_history_state.history();
             if let Some(history_vec) = history {
                 for i in 0..history_vec.len() {
-                    if fv[i] > history_vec[i] {
-                        history_vec[i] = fv[i];
+                    let mut fv_val = fv_values[i];
+                    let mut history_val = history_vec[i];
+
+                    // change this flag to tweak alg
+                    let bucket_vals = false; // also called "log2"
+                    if bucket_vals {
+                        fn bucket(mut val: u64) -> u8 {
+                            let mut bucket_val = 0;
+                            while val > 0 {
+                                val >>= 1;
+                                bucket_val += 1;
+                            }
+                            bucket_val
+                        }
+                        fv_val = bucket(fv_val) as u64;
+                        history_val = bucket(history_val) as u64;
+                    }
+
+                    if fv_val > history_val {
+                        history_vec[i] = fv_values[i];
                         is_interesting = true;
                     }
                 }
             } else {
-                *history = Some(fv);
+                *history = Some(fv_values.clone());
                 is_interesting = true;
             }
-            Ok(is_interesting)
-            // let seen_fvs = input_history_state.fvs();
-            // if !seen_fvs.contains(&fv) { // TODO: use HashSet instead?
-            //     seen_fvs.push(fv);
-            //     Ok(true) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
-            // } else {
-            //     Ok(false)
-            // }
+
+            // change this flag to tweak the alg
+            let unique_is_interesting = true;
+            if unique_is_interesting {
+                let seen_fvs = input_history_state.fvs();
+                if !seen_fvs.contains(&fv_values) { // TODO: use HashSet instead?
+                    seen_fvs.push(fv_values);
+                    is_interesting = true;
+                } else {
+                    is_interesting = false;
+                }
+            }
+            Ok(is_interesting) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
         } else {
             // for now, let's say that a parsing failure isn't very interesting
             Ok(false)

@@ -1113,8 +1113,8 @@ pub struct InputFeedback {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct InputFeedbackMetadata {
-    history: Option<Vec<u8>>,
-    fvs: Vec<Vec<u8>>,
+    history: Option<Vec<u64>>,
+    fvs: Vec<Vec<u64>>,
 }
 
 crate::impl_serdeany!(
@@ -1128,10 +1128,10 @@ impl InputFeedbackMetadata {
             fvs: Vec::new(),
         }
     }
-    pub fn fvs(&mut self) -> &mut Vec<Vec<u8>> {
+    pub fn fvs(&mut self) -> &mut Vec<Vec<u64>> {
         &mut self.fvs
     }
-    pub fn history(&mut self) -> &mut Option<Vec<u8>> {
+    pub fn history(&mut self) -> &mut Option<Vec<u64>> {
         &mut self.history
     }
     // pub fn set_history(&mut self, history: Option<Vec<f64>>) {
@@ -1241,7 +1241,8 @@ pub struct OutputFeedback {
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
 pub struct OutputFeedbackMetadata {
-    fvs: Vec<Vec<f64>>,
+    fvs: Vec<Vec<u64>>,
+    history: Option<Vec<u64>>,
 }
 
 crate::impl_serdeany!(
@@ -1252,10 +1253,14 @@ impl OutputFeedbackMetadata {
     pub fn new() -> Self {
         Self {
             fvs: Vec::new(),
+            history: None,
         }
     }
-    pub fn fvs(&mut self) -> &mut Vec<Vec<f64>> {
+    pub fn fvs(&mut self) -> &mut Vec<Vec<u64>> {
         &mut self.fvs
+    }
+    pub fn history(&mut self) -> &mut Option<Vec<u64>> {
+        &mut self.history
     }
 }
 
@@ -1293,21 +1298,33 @@ where
 
             let grammar = dns::dns();
             let fv_template = grammar.features();
-            let input_bytes = last_output;
+            let output_bytes = last_output;
             let ctx = Context::new(Weak::new(), Children::Zilch);
-            if let Ok(tree) = grammar.parse(&mut BitArray::new(input_bytes.to_vec(), None), &Rc::new(ctx)) {
+            if let Ok(tree) = grammar.parse(&mut BitArray::new(output_bytes.to_vec(), None), &Rc::new(ctx)) {
                 let mut fv = fv_template.empty();
                 tree.do_vectorization(&mut fv, 0);
-                let last_output_fv = fv.values();
+                let last_output_fv = fv.values_u64();
 
                 let output_history_state = state
                     .named_metadata_mut()
                     .get_mut::<OutputFeedbackMetadata>(&self.name)
                     .unwrap();
+
+                let history = output_history_state.history();
+                if let Some(history_vec) = history {
+                    for i in 0..history_vec.len() {
+                        if last_output_fv[i] > history_vec[i] {
+                            history_vec[i] = last_output_fv[i];
+                        }
+                    }
+                } else {
+                    *history = Some(last_output_fv.clone());
+                }
+
                 let fvs = output_history_state.fvs();
 
                 if fvs.contains(&last_output_fv) {
-                    println!("repeat FV");
+                    // println!("repeat FV");
                     return Ok(false);
                 }
                 fvs.push(last_output_fv.clone());
@@ -1317,6 +1334,8 @@ where
                 // println!("parsing failure");
                 if !last_output.is_empty() {
                     println!("found malformed output: {:?}", &last_output);
+                    println!("corresponding input: {:?}", &_input);
+                    // Can I grab the corresponding input easily???
                 }
                 return Ok(false);
             }

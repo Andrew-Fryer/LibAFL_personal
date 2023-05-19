@@ -1,5 +1,5 @@
 use core::time::Duration;
-use std::{path::PathBuf, str::FromStr, fs};
+use std::{path::PathBuf, str::FromStr, fs, num, fmt};
 use time::OffsetDateTime;
 
 use clap::{self, Parser};
@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata}, feedback_and,
+    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -118,6 +118,12 @@ pub fn main() {
     // This one is composed by two Feedbacks in OR
     #[cfg(feedback_alg = "AflEdges")]
     let (feedback_name, mut feedback) = (&"AflEdges", feedback_or!(
+        feedback_and!(
+            // these are here so that we compute grammar coverage
+            InputFeedback::new_with_observer(&input_observer),
+            OutputFeedback::new_with_observer(&output_observer),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
         // New maximization map feedback linked to the edges observer and the feedback state
         MaxMapFeedback::new_tracking(&edges_observer, true, false),
         // Time feedback, this one does not need a feedback state
@@ -126,6 +132,12 @@ pub fn main() {
     // TODO: I should probably change this to probabilistically pick inputs because this logs every exec and keeps all inputs in the corpus in memory (I think), which is probably pretty bad for performance...
     #[cfg(feedback_alg = "ConstTrue")]
     let (feedback_name, mut feedback) = (&"ConstTrue", feedback_or!(
+        feedback_and!(
+            // these are here so that we compute grammar coverage
+            InputFeedback::new_with_observer(&input_observer),
+            OutputFeedback::new_with_observer(&output_observer),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
         // New maximization map feedback linked to the edges observer and the feedback state
         MaxMapFeedback::new_tracking(&edges_observer, true, false),
         ConstFeedback::True,
@@ -137,6 +149,7 @@ pub fn main() {
         // New maximization map feedback linked to the edges observer and the feedback state
         feedback_and!(
             MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            OutputFeedback::new_with_observer(&output_observer),
             ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
         ),
         InputFeedback::new_with_observer(&input_observer),
@@ -148,6 +161,7 @@ pub fn main() {
         // New maximization map feedback linked to the edges observer and the feedback state
         feedback_and!(
             MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            InputFeedback::new_with_observer(&input_observer),
             ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
         ),
         OutputFeedback::new_with_observer(&output_observer),
@@ -282,4 +296,27 @@ pub fn main() {
         let history_map = map_state.history_map.as_slice();
         fs::write("edge_final_coverage", history_map);
 
+        // write out history input grammar edge coverage to disk
+        let input_history_state = state
+            .named_metadata_mut()
+            .get_mut::<InputFeedbackMetadata>(&"GrammarInput")
+            .unwrap();
+        let history_input_fvs = input_history_state.history().as_ref().unwrap();
+        fs::write("input_grammar_coverage", u64s_to_string(history_input_fvs));
+
+        // write out history output grammar edge coverage to disk
+        let output_history_state = state
+            .named_metadata_mut()
+            .get_mut::<OutputFeedbackMetadata>(&"GrammarOutput")
+            .unwrap();
+        let history_output_fvs = output_history_state.history().as_ref().unwrap();
+        fs::write("output_grammar_coverage", u64s_to_string(history_output_fvs));
+
+        let num_elements_in_corpus = state.corpus().count();
+        let num_elements_in_corpus_message = format!("num_elements_in_corpus: {}", num_elements_in_corpus);
+        fs::write("num_elements_in_corpus", num_elements_in_corpus_message);
+}
+
+fn u64s_to_string(input: &[u64]) -> String {
+    input.iter().map(|val| format!("{}\n", val)).collect()
 }

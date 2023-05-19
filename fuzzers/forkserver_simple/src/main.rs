@@ -86,6 +86,23 @@ struct Opt {
         default_value = "SIGKILL"
     )]
     signal: Signal,
+
+    #[arg(
+        help = "The fuzzing run name",
+        long = "run_name",
+        name = "run_name",
+        default_value = "",
+    )]
+    run_name: String,
+
+    #[arg(
+        help = "The number of iters to run (remember that there are 50 execs per iter)",
+        short = 'i',
+        long = "iters",
+        name = "iters",
+        default_value = "20000",
+    )]
+    iters: u64,
 }
 
 #[allow(clippy::similar_names)]
@@ -208,9 +225,12 @@ pub fn main() {
     .unwrap();
 
     // The Monitor trait define how the fuzzer stats are reported to the user
-    let timestamp = OffsetDateTime::now_utc();
-    let run_dir_path = format!("./{}/{}", feedback_name, timestamp);
-    fs::create_dir(&run_dir_path).unwrap();
+    // let timestamp = OffsetDateTime::now_utc();
+    let mut run_dir_path = "./";
+    if opt.run_name != "" {
+        let run_dir_path = format!("./{}", opt.run_name);
+        fs::create_dir(&run_dir_path).unwrap();
+    }
     let coverage_file = format!("{}/coverage.csv", &run_dir_path);
     let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
 
@@ -284,9 +304,8 @@ pub fn main() {
         StdScheduledMutator::with_max_stack_pow(havoc_mutations().merge(tokens_mutations()), 6);
     let mut stages = tuple_list!(StdMutationalStage::new(mutator));
 
-    let iters = 2; // TODO: why isn't it stopping at 100000 execs?
     fuzzer
-        .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, iters)
+        .fuzz_loop_for(&mut stages, &mut executor, &mut state, &mut mgr, opt.iters)
         // .fuzz_loop(&mut stages, &mut executor, &mut state, &mut mgr)
         .expect("Error in the fuzzing loop");
 

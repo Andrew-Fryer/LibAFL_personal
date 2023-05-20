@@ -1273,6 +1273,13 @@ where
                     is_interesting = false;
                 }
             }
+
+            // change this flag to tweak the alg
+            let well_formed_is_interesting = true;
+            if well_formed_is_interesting {
+                is_interesting = true;
+            }
+            
             Ok(is_interesting) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
         } else {
             // for now, let's say that a parsing failure isn't very interesting

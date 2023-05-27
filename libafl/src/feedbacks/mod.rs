@@ -1237,7 +1237,7 @@ where
                     let mut fv_val = fv_values[i];
                     let mut history_val = history_vec[i];
 
-                    // change this flag to tweak alg
+                    // change this flag to tweak the alg
                     let bucket_vals = true; // also called "log2"
                     if bucket_vals {
                         fn bucket(mut val: u64) -> u8 {
@@ -1275,7 +1275,7 @@ where
             }
 
             // change this flag to tweak the alg
-            let well_formed_is_interesting = true;
+            let well_formed_is_interesting = false;
             if well_formed_is_interesting {
                 is_interesting = true;
             }

@@ -1263,7 +1263,7 @@ where
             }
 
             // change this flag to tweak the alg
-            let unique_is_interesting = false;
+            let unique_is_interesting = true;
             if unique_is_interesting {
                 let seen_fvs = input_history_state.fvs();
                 if !seen_fvs.contains(&fv_values) { // TODO: use HashSet instead?
@@ -1275,7 +1275,7 @@ where
             }
 
             // change this flag to tweak the alg
-            let well_formed_is_interesting = true;
+            let well_formed_is_interesting = false;
             if well_formed_is_interesting {
                 is_interesting = true;
             }

@@ -300,7 +300,7 @@ pub fn main() {
     // In case the corpus is empty (on first run), reset
     if state.corpus().count() < 1 {
         state
-            .load_initial_inputs_forced(&mut fuzzer, &mut executor, &mut mgr, &corpus_dirs)
+            .load_initial_inputs(&mut fuzzer, &mut executor, &mut mgr, &corpus_dirs)
             .unwrap_or_else(|err| {
                 panic!(
                     "Failed to load initial corpus at {:?}: {:?}",

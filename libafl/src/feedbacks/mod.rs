@@ -1279,6 +1279,12 @@ where
             if well_formed_is_interesting {
                 is_interesting = true;
             }
+
+            // this will hopefully protect the fuzzer from very large inputs
+            if is_interesting && input_bytes.len() > 1024 {
+                println!("dropping interesting input because it is too big");
+                is_interesting = false;
+            }
             
             Ok(is_interesting) // this should really be a ranking (f64 perhaps) with respect to the other inputs in the corpus
         } else {

@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, RandomFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata}, feedback_and,
+    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, RandomFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata, HasLen}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -100,7 +100,7 @@ struct Opt {
         short = 'i',
         long = "iters",
         name = "iters",
-        default_value = "20000",
+        default_value = "60000",
     )]
     iters: u64,
 }
@@ -343,8 +343,16 @@ pub fn main() {
         .named_metadata_mut()
         .get_mut::<OutputFeedbackMetadata>(&"output")
         .unwrap();
-    let history_output_fvs = output_history_state.history().as_ref().unwrap();
+    let dummy = Vec::new();
+    let history_output_fvs = output_history_state.history().as_ref().unwrap_or_else(|| &dummy);
     fs::write(format!("{}/output_grammar_coverage", &run_dir_path), u64s_to_string(history_output_fvs));
+
+    let mut sizes_of_corpus_elements = "".to_owned();
+    for i in 0..state.corpus().count() {
+        let el = state.corpus().get(i);
+        sizes_of_corpus_elements.push_str(&format!("{}\n", el.unwrap().borrow().input().as_ref().unwrap().len()));
+    }
+    fs::write(format!("{}/sizes_of_corpus_elements", &run_dir_path), sizes_of_corpus_elements);
 
     let num_elements_in_corpus = state.corpus().count();
     let num_elements_in_corpus_message = format!("num_elements_in_corpus: {}", num_elements_in_corpus);

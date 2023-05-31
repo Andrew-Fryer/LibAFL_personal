@@ -721,6 +721,7 @@ where
                     phantom: PhantomData,
                 },
             )?;
+            println!("Found interesting input: {:?}", _input);
         }
 
         Ok(interesting)

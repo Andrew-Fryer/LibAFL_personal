@@ -174,6 +174,19 @@ pub fn main() {
         // Time feedback, this one does not need a feedback state
         TimeFeedback::new_with_observer(&time_observer)
     ));
+    #[cfg(feedback_alg = "ConstFalse")]
+    let (feedback_name, mut feedback) = (&"ConstFalse", feedback_or!(
+        feedback_and!(
+            // New maximization map feedback linked to the edges observer and the feedback state
+            MaxMapFeedback::new_tracking(&edges_observer, true, false),
+            // these are here so that we compute grammar coverage
+            InputFeedback::new_with_observer(&input_observer),
+            OutputFeedback::new_with_observer(&output_observer),
+            ConstFeedback::False // this ensures that MaxMapFeedback doesn't help us out
+        ),
+        // Time feedback, this one does not need a feedback state
+        TimeFeedback::new_with_observer(&time_observer)
+    ));
     #[cfg(feedback_alg = "GrammarInput")]
     let (feedback_name, mut feedback) = (&"GrammarInput", feedback_or!(
         // New maximization map feedback linked to the edges observer and the feedback state

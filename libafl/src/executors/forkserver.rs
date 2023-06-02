@@ -451,7 +451,6 @@ where
                 .copy_from_slice(target_bytes.as_slice());
         } else if self.pipe_input {
             if let Some(pipe) = &self.input_pipe {
-                println!("...executor about to write {} bytes to pipe...", input.target_bytes().as_slice().len());
                 let len = pipe.borrow_mut().write(input.target_bytes().as_slice())?;
                 // let's hope that len is the full length...
                 assert!(len == input.target_bytes().as_slice().len());

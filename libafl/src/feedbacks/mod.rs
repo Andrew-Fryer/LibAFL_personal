@@ -1237,8 +1237,8 @@ where
                     let mut fv_val = fv_values[i];
                     let mut history_val = history_vec[i];
 
-                    // change this flag to tweak alg
-                    let bucket_vals = false; // also called "log2"
+                    // change this flag to tweak the alg
+                    let bucket_vals = true; // also called "log2"
                     if bucket_vals {
                         fn bucket(mut val: u64) -> u8 {
                             let mut bucket_val = 0;

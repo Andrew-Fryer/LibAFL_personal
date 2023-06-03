@@ -26,7 +26,7 @@ use libafl::{
     observers::{HitcountsMapObserver, MapObserver, StdMapObserver, TimeObserver},
     schedulers::{IndexesLenTimeMinimizerScheduler, QueueScheduler},
     stages::mutational::StdMutationalStage,
-    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, RandomFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata, HasLen}, feedback_and,
+    state::{HasCorpus, HasMetadata, StdState, HasNamedMetadata}, prelude::{CoverageMonitor, ConstFeedback, RandomFeedback, forkserver, OutputFeedback, InputFeedback, OutputObserver, Feedback, HasClientPerfMonitor, UsesInput, CombinedFeedback, MapFeedback, DifferentIsNovel, MaxReducer, RomuDuoJrRand, LogicEagerOr, InputObserver, MapFeedbackMetadata, InputFeedbackMetadata, OutputFeedbackMetadata, HasLen, CoverageTrackingMetadata}, feedback_and,
 };
 use nix::sys::signal::Signal;
 
@@ -244,8 +244,12 @@ pub fn main() {
         let run_dir_path = format!("./{}", opt.run_name);
         fs::create_dir(&run_dir_path).unwrap();
     }
-    let coverage_file = format!("{}/coverage.csv", &run_dir_path);
-    let monitor = CoverageMonitor::new(|s| println!("{}", s), &coverage_file).expect("successfully created CoverageMonitor");
+    let coverage_file = CoverageTrackingMetadata{
+        coverage_file_path: format!("{}/coverage.csv", &run_dir_path),
+        num_execs: 0,
+    };
+    state.add_named_metadata(coverage_file, &"coverage_file_path");
+    let monitor = CoverageMonitor::new(|s| println!("{}", s), &"dummy").expect("successfully created CoverageMonitor");
 
     // The event manager handle the various events generated during the fuzzing loop
     // such as the notification of the addition of a new item to the corpus

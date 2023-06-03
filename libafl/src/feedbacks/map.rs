@@ -11,6 +11,7 @@ use core::{
     marker::PhantomData,
     ops::{BitAnd, BitOr},
 };
+use std::{fs::OpenOptions, io::Write};
 
 use num_traits::PrimInt;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -279,6 +280,17 @@ impl MapNoveltiesMetadata {
         Self { list }
     }
 }
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug)]
+#[serde()]
+pub struct CoverageTrackingMetadata {
+    pub coverage_file_path: String,
+    pub num_execs: u64,
+}
+
+crate::impl_serdeany!(
+    CoverageTrackingMetadata
+);
 
 /// The state of [`MapFeedback`]
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -721,6 +733,20 @@ where
                     phantom: PhantomData,
                 },
             )?;
+
+            let mut coverage_tracking_metadata = state
+                .named_metadata_mut()
+                .get_mut::<CoverageTrackingMetadata>(&"coverage_file_path")
+                .unwrap();
+            let mut progress_log_file = OpenOptions::new()
+                .write(true)
+                .append(true)
+                .open(coverage_tracking_metadata.coverage_file_path.to_string())
+                .unwrap();
+            let csv_row = format!("{}, {}, {}\n", coverage_tracking_metadata.num_execs, filled, len as u64);
+            coverage_tracking_metadata.num_execs += 1;
+            progress_log_file.write_all(csv_row.as_bytes()).unwrap();
+
             println!("Found interesting input: {:?}", _input);
         }
 

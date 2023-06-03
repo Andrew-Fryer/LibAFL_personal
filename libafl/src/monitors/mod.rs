@@ -517,8 +517,8 @@ where
         );
         (self.print_fn)(fmt);
 
-        let csv_row = format!("{}, {}, {}\n", total_execs, coverage_data.0, coverage_data.1);
-        self.progress_log_file.write_all(csv_row.as_bytes()).unwrap();
+        // let csv_row = format!("{}, {}, {}\n", total_execs, coverage_data.0, coverage_data.1);
+        // self.progress_log_file.write_all(csv_row.as_bytes()).unwrap();
     }
 }
 

@@ -1118,13 +1118,13 @@ impl RandomFeedback {
 
 impl<S> Feedback<S> for RandomFeedback
 where
-    S: UsesInput + HasClientPerfMonitor,
+    S: UsesInput + HasClientPerfMonitor + HasNamedMetadata + Debug,
 {
     #[inline]
     #[allow(clippy::wrong_self_convention)]
     fn is_interesting<EM, OT>(
         &mut self,
-        _state: &mut S,
+        state: &mut S,
         _manager: &mut EM,
         _input: &S::Input,
         _observers: &OT,
@@ -1134,6 +1134,14 @@ where
         EM: EventFirer<State = S>,
         OT: ObserversTuple<S>,
     {
+        let coverage_tracking_metadata = state
+            .named_metadata_mut()
+            .get_mut::<CoverageTrackingMetadata>(&"coverage_file_path")
+            .unwrap();
+        if coverage_tracking_metadata.num_execs == 0 {
+            return Ok(true);
+        }
+
         let precision = 1000000;
         let mut rng = rand::thread_rng(); // I (Andrew) do this here because it isn't serializable
         let rand_val = rng.gen_range(0..precision);

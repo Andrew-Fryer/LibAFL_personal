@@ -1405,7 +1405,7 @@ where
 
                 if fvs.contains(&last_output_fv) {
                     // println!("repeat FV");
-                    return Ok(false);
+                    return Ok(true);
                 }
                 fvs.push(last_output_fv.clone());
                 println!("found novel output: {:?}", &last_output);

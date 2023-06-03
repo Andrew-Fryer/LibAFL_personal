@@ -1138,7 +1138,7 @@ where
             .named_metadata_mut()
             .get_mut::<CoverageTrackingMetadata>(&"coverage_file_path")
             .unwrap();
-        if coverage_tracking_metadata.num_execs == 0 {
+        if coverage_tracking_metadata.num_execs == 1 {
             return Ok(true);
         }
 

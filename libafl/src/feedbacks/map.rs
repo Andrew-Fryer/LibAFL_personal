@@ -684,6 +684,15 @@ where
         EM: EventFirer<State = S>,
         OT: ObserversTuple<S>,
     {
+        let mut coverage_tracking_metadata = state
+            .named_metadata_mut()
+            .get_mut::<CoverageTrackingMetadata>(&"coverage_file_path")
+            .unwrap();
+        let num_execs = coverage_tracking_metadata.num_execs;
+        coverage_tracking_metadata.num_execs += 1;
+        let coverage_log_path = coverage_tracking_metadata.coverage_file_path.to_string();
+        drop(coverage_tracking_metadata);
+
         let mut interesting = false;
         // TODO Replace with match_name_type when stable
         let observer = observers.match_name::<O>(&self.observer_name).unwrap();
@@ -734,17 +743,12 @@ where
                 },
             )?;
 
-            let mut coverage_tracking_metadata = state
-                .named_metadata_mut()
-                .get_mut::<CoverageTrackingMetadata>(&"coverage_file_path")
-                .unwrap();
             let mut progress_log_file = OpenOptions::new()
                 .write(true)
                 .append(true)
-                .open(coverage_tracking_metadata.coverage_file_path.to_string())
+                .open(coverage_log_path)
                 .unwrap();
-            let csv_row = format!("{}, {}, {}\n", coverage_tracking_metadata.num_execs, filled, len as u64);
-            coverage_tracking_metadata.num_execs += 1;
+            let csv_row = format!("{}, {}, {}\n", num_execs, filled, len as u64);
             progress_log_file.write_all(csv_row.as_bytes()).unwrap();
 
             println!("Found interesting input: {:?}", _input);

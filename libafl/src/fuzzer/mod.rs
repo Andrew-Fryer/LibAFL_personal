@@ -497,95 +497,27 @@ where
         let exit_kind = self.execute_input(state, executor, manager, &input)?;
         let observers = executor.observers();
         // Always consider this to be "interesting"
-        let mut res = ExecuteInputResult::None;
 
+        // However, we still want to trigger the side effects of objectives and feedbacks.
         #[cfg(not(feature = "introspection"))]
-        let is_solution = self
+        let _is_solution = self
             .objective_mut()
-            .is_interesting(state, manager, &input, observers, exit_kind)?;
+            .is_interesting(state, manager, &input, observers, &exit_kind)?;
 
         #[cfg(feature = "introspection")]
-        let is_solution = self
+        let _is_solution = self
             .objective_mut()
             .is_interesting_introspection(state, manager, &input, observers, exit_kind)?;
 
-        if is_solution {
-            res = ExecuteInputResult::Solution;
-        } else {
-            #[cfg(not(feature = "introspection"))]
-            let is_corpus = self
-                .feedback_mut()
-                .is_interesting(state, manager, &input, observers, exit_kind)?;
+        #[cfg(not(feature = "introspection"))]
+        let _is_corpus = self
+            .feedback_mut()
+            .is_interesting(state, manager, &input, observers, exit_kind)?;
 
-            #[cfg(feature = "introspection")]
-            let is_corpus = self
-                .feedback_mut()
-                .is_interesting_introspection(state, manager, &input, observers, exit_kind)?;
-
-            if is_corpus {
-                res = ExecuteInputResult::Corpus;
-            }
-        }
-
-        match res {
-            ExecuteInputResult::None => {
-                self.feedback_mut().discard_metadata(state, &input)?;
-                self.objective_mut().discard_metadata(state, &input)?;
-                Ok((res, None))
-            }
-            ExecuteInputResult::Corpus => {
-                // Not a solution
-                self.objective_mut().discard_metadata(state, &input)?;
-
-                // Add the input to the main corpus
-                let mut testcase = Testcase::with_executions(input.clone(), *state.executions());
-                self.feedback_mut().append_metadata(state, &mut testcase)?;
-                let idx = state.corpus_mut().add(testcase)?;
-                self.scheduler_mut().on_add(state, idx)?;
-
-                if send_events {
-                    // TODO set None for fast targets
-                    let observers_buf = if manager.configuration() == EventConfig::AlwaysUnique {
-                        None
-                    } else {
-                        Some(manager.serialize_observers::<OT>(observers)?)
-                    };
-                    manager.fire(
-                        state,
-                        Event::NewTestcase {
-                            input,
-                            observers_buf,
-                            exit_kind: *exit_kind,
-                            corpus_size: state.corpus().count(),
-                            client_config: manager.configuration(),
-                            time: current_time(),
-                            executions: *state.executions(),
-                        },
-                    )?;
-                }
-                Ok((res, Some(idx)))
-            }
-            ExecuteInputResult::Solution => {
-                // Not interesting
-                self.feedback_mut().discard_metadata(state, &input)?;
-
-                // The input is a solution, add it to the respective corpus
-                let mut testcase = Testcase::with_executions(input, *state.executions());
-                self.objective_mut().append_metadata(state, &mut testcase)?;
-                state.solutions_mut().add(testcase)?;
-
-                if send_events {
-                    manager.fire(
-                        state,
-                        Event::Objective {
-                            objective_size: state.solutions().count(),
-                        },
-                    )?;
-                }
-
-                Ok((res, None))
-            }
-        }
+        #[cfg(feature = "introspection")]
+        let _is_corpus = self
+            .feedback_mut()
+            .is_interesting_introspection(state, manager, &input, observers, exit_kind)?;
 
         // Not a solution
         self.objective_mut().discard_metadata(state, &input)?;

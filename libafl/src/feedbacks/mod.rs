@@ -4,6 +4,7 @@
 //! TODO: make S of Feedback<S> an associated type when specialisation + AT is stable
 
 pub mod map;
+use alloc::boxed::Box;
 use alloc::rc::Rc;
 use alloc::rc::Weak;
 use alloc::vec::Vec;
@@ -43,8 +44,10 @@ pub use nautilus::*;
 use serde::{Deserialize, Serialize};
 
 use crate::inputs::HasBytesVec;
+use crate::observers::HitcountsMapObserver;
 use crate::observers::InputObserver;
 use crate::observers::OutputObserver;
+use crate::observers::StdMapObserver;
 use crate::prelude::HasNamedMetadata;
 use crate::{
     bolts::tuples::Named,
@@ -1099,6 +1102,105 @@ impl From<bool> for ConstFeedback {
         } else {
             Self::False
         }
+    }
+}
+
+// /// The [`ClosureCompositeFeedback`] is flexible
+// #[derive(Serialize, Deserialize, Clone, Debug)]
+// pub struct ClosureCompositeFeedback {
+//     sub_feedbacks: Vec<Box<dyn Feedback>>,
+//     is_interesting_closure: Fn<Vec<bool>, bool>,
+// }
+
+// impl ClosureCompositeFeedback {
+//     pub fn new(probability: f64) -> Self {
+//         Self {
+//             probability,
+//         }
+//     }
+// }
+
+// impl<S> Feedback<S> for ClosureCompositeFeedback
+// where
+//     S: UsesInput + HasClientPerfMonitor,
+// {
+//     fn init_state(&mut self, state: &mut S) -> Result<(), Error> {
+//         state.add_named_metadata(InputFeedbackMetadata::new(), &self.name);
+
+//         // self.grammar = dns::dns();
+//         // self.fv_template = self.grammar.features();
+
+//         Ok(())
+//     }
+//     #[inline]
+//     #[allow(clippy::wrong_self_convention)]
+//     fn is_interesting<EM, OT>(
+//         &mut self,
+//         _state: &mut S,
+//         _manager: &mut EM,
+//         _input: &S::Input,
+//         _observers: &OT,
+//         _exit_kind: &ExitKind,
+//     ) -> Result<bool, Error>
+//     where
+//         EM: EventFirer<State = S>,
+//         OT: ObserversTuple<S>,
+//     {
+//         let precision = 1000000;
+//         let mut rng = rand::thread_rng(); // I (Andrew) do this here because it isn't serializable
+//         let rand_val = rng.gen_range(0..precision);
+//         let result = (rand_val as f64) < self.probability * precision as f64;
+//         Ok(result)
+//     }
+// }
+
+// impl Named for ClosureCompositeFeedback {
+//     #[inline]
+//     fn name(&self) -> &str {
+//         "ClosureCompositeFeedback"
+//     }
+// }
+
+/// The [`AndrewFeedback`] uses input from the SUT
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct AndrewFeedback {
+    map_feedback: MapFeedback<DifferentIsNovel, HitcountsMapObserver<StdMapObserver<u8, false>>, MaxReducer, u8>,
+    input_feedback: InputFeedback,
+    output_feedback: OutputFeedback,
+    time_feedback: TimeFeedback,
+}
+
+impl<S> Feedback<S> for AndrewFeedback
+where
+    // S: UsesInput + HasClientPerfMonitor,
+    S: UsesInput + HasClientPerfMonitor + HasNamedMetadata + Debug,
+    S::Input: HasBytesVec, // I think this means that InputFeedback will only implement Feedback for S::Input types that implement HasBytesVec
+{
+    fn init_state(&mut self, state: &mut S) -> Result<(), Error> {
+        
+    }
+    #[inline]
+    #[allow(clippy::wrong_self_convention)]
+    fn is_interesting<EM, OT>(
+        &mut self,
+        state: &mut S,
+        _manager: &mut EM,
+        input: &<S as UsesInput>::Input,
+        observers: &OT,
+        _exit_kind: &ExitKind,
+    ) -> Result<bool, Error>
+    where
+        EM: EventFirer<State = S>,
+        OT: ObserversTuple<S>,
+    {
+        Ok(false)
+    }
+}
+
+impl Named for AndrewFeedback {
+    #[inline]
+    fn name(&self) -> &str {
+        &"AndrewFeedback"
     }
 }
 

@@ -99,7 +99,7 @@ concat-idents = { version = "1.1.3", optional = true }
 # !!! this create requires nightly
 grammartec = { version = "0.2", optional = true }
 
-andrew_fuzz = { path = "../../andrewFuzz_rust/andrew_fuzz/" }
+andrew_fuzz = { path = "../../andrew_fuzz_rust/" }
 
 rand = "0.8.4"
 
